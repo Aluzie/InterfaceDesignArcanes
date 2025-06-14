@@ -1,0 +1,10 @@
+# Enable directory browsing
+Options +Indexes
+
+# Serve HTML files properly
+<IfModule mod_mime.c>
+    AddType text/html .html
+</IfModule>
+
+# Prevent redirect to index
+DirectoryIndex disabled
