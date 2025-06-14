@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanes | My Account</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Css/account.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation with standalone Logout button -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3" :class="{'scrolled': scrolled}">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <i class="bi bi-gem me-2"></i>Arcanes
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="About.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Contact.html">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="cart.html">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                                <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge">
+                                    {{ cartCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <!-- When logged in, show My Account and Logout -->
+                        <template v-if="isLoggedIn">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="account.html">
+                                    <i class="bi bi-person-circle me-1"></i>My Account
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="#" @click.prevent="logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </li>
+                        </template>
+                        <!-- When NOT logged in, show Login & Register -->
+                        <template v-else>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.html">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="register.html">Register</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Profile Header -->
+        <section class="profile-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center text-md-start mb-4 mb-md-0">
+                        <div class="profile-pic-wrapper">
+                            <img :src="user.profilePic" alt="Profile Picture" class="profile-pic">
+                            <div class="profile-pic-edit" @click="showProfilePicModal">
+                                <i class="bi bi-pencil"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9 text-center text-md-start">
+                        <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+                        <p class="mb-2"><i class="bi bi-envelope me-2"></i>{{ user.email }}</p>
+                        <p class="mb-0"><i class="bi bi-telephone me-2"></i>{{ user.phone }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Picture Upload Modal -->
+        <div class="modal fade" id="profilePicModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Update Profile Picture</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4" v-if="imagePreview">
+                            <img :src="imagePreview" alt="Profile Picture Preview" class="img-fluid rounded-circle profile-preview">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="profilePicInput" class="form-label">Select Image</label>
+                            <input type="file" class="form-control" id="profilePicInput" accept="image/*" @change="previewImage">
+                            <div class="form-text">Recommended: Square image, at least 200x200 pixels.</div>
+                        </div>
+                        
+                        <!-- Camera capture option (mobile devices) -->
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-secondary w-100" @click="activateCamera">
+                                <i class="bi bi-camera me-2"></i>Take Photo
+                            </button>
+                        </div>
+                        
+                        <!-- Camera stream (hidden by default) -->
+                        <div v-if="showCamera" class="camera-container mb-3">
+                            <video ref="cameraStream" class="camera-stream" autoplay></video>
+                            <button class="btn btn-primary camera-capture" @click="capturePhoto">
+                                <i class="bi bi-camera"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" @click="saveProfilePic" :disabled="!imagePreview">
+                            Save Picture
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Content -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-3">
+                        <!-- Account Tabs (Sidebar Style) -->
+                        <ul class="nav flex-column account-tabs" id="accountTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="personal-info-tab" data-bs-toggle="tab" data-bs-target="#personal-info" type="button" role="tab" aria-controls="personal-info" aria-selected="true">
+                                    <i class="bi bi-person"></i> Personal Info
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="false">
+                                    <i class="bi bi-bag"></i> My Orders
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="addresses-tab" data-bs-toggle="tab" data-bs-target="#addresses" type="button" role="tab" aria-controls="addresses" aria-selected="false">
+                                    <i class="bi bi-geo-alt"></i> Addresses
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="payment-methods-tab" data-bs-toggle="tab" data-bs-target="#payment-methods" type="button" role="tab" aria-controls="payment-methods" aria-selected="false">
+                                    <i class="bi bi-credit-card"></i> Payment Methods
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="account-settings-tab" data-bs-toggle="tab" data-bs-target="#account-settings" type="button" role="tab" aria-controls="account-settings" aria-selected="false">
+                                    <i class="bi bi-gear"></i> Account Settings
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-lg-9">
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="accountTabContent">
+                            <!-- Personal Info Tab -->
+                            <div class="tab-pane fade show active" id="personal-info" role="tabpanel">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="mb-4">Personal Information</h5>
+                                        
+                                        <form @submit.prevent="updatePersonalInfo">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label for="firstName" class="form-label">First Name</label>
+                                                    <input type="text" class="form-control" id="firstName" v-model="user.firstName" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="lastName" class="form-label">Last Name</label>
+                                                    <input type="text" class="form-control" id="lastName" v-model="user.lastName" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="email" class="form-label">Email Address</label>
+                                                    <input type="email" class="form-control" id="email" v-model="user.email" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="phone" class="form-label">Phone Number</label>
+                                                    <input type="tel" class="form-control" id="phone" v-model="user.phone">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="birthdate" class="form-label">Date of Birth</label>
+                                                    <input type="date" class="form-control" id="birthdate" v-model="user.birthdate">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="gender" class="form-label">Gender</label>
+                                                    <select class="form-select" id="gender" v-model="user.gender">
+                                                        <option value="">Prefer not to say</option>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="d-flex justify-content-end">
+                                                        <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+                                                            <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                            Save Changes
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <div class="card border-0 shadow-sm mt-4">
+                                    <div class="card-body p-4">
+                                        <h5 class="mb-3">Recent Orders</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" v-if="user.orders && user.orders.length > 0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order #</th>
+                                                        <th>Date</th>
+                                                        <th>Total</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="order in recentOrders" :key="order.id">
+                                                        <td>#{{ order.id }}</td>
+                                                        <td>{{ formatDate(order.date) }}</td>
+                                                        <td>${{ order.total.toFixed(2) }}</td>
+                                                        <td>
+                                                            <span :class="'status-badge status-' + order.status.toLowerCase()">
+                                                                {{ order.status }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-primary">View</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="text-center py-4" v-else>
+                                                <div class="empty-state">
+                                                    <i class="bi bi-bag-x display-4 text-muted"></i>
+                                                    <p class="mt-3 mb-0">You haven't placed any orders yet.</p>
+                                                    <a href="products.html" class="btn btn-primary mt-3">Start Shopping</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-end mt-2" v-if="user.orders.length > 0">
+                                            <a href="orders.html" class="text-decoration-none">View all orders <i class="bi bi-arrow-right"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Orders Tab -->
+                            <div class="tab-pane fade" id="orders" role="tabpanel">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="mb-4">My Orders</h5>
+                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" v-if="user.orders.length > 0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order #</th>
+                                                        <th>Date</th>
+                                                        <th>Items</th>
+                                                        <th>Total</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="order in user.orders" :key="order.id">
+                                                        <td>#{{ order.id }}</td>
+                                                        <td>{{ formatDate(order.date) }}</td>
+                                                        <td>{{ order.items.length }}</td>
+                                                        <td>${{ order.total.toFixed(2) }}</td>
+                                                        <td>
+                                                            <span :class="'status-badge status-' + order.status.toLowerCase()">
+                                                                {{ order.status }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-primary" @click="viewOrderDetails(order)">View</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="text-center py-4" v-else>
+                                                <div class="empty-state">
+                                                    <i class="bi bi-bag-x display-4 text-muted"></i>
+                                                    <p class="mt-3 mb-0">You haven't placed any orders yet.</p>
+                                                    <a href="products.html" class="btn btn-primary mt-3">Start Shopping</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Details Modal -->
+                            <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Order Details #{{ selectedOrder?.id }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" v-if="selectedOrder">
+                                            <!-- Order summary -->
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold">Order Information</h6>
+                                                    <p class="mb-1"><strong>Date:</strong> {{ formatDate(selectedOrder.date) }}</p>
+                                                    <p class="mb-1">
+                                                        <strong>Status:</strong> 
+                                                        <span :class="'status-badge status-' + selectedOrder.status.toLowerCase()">
+                                                            {{ selectedOrder.status }}
+                                                        </span>
+                                                    </p>
+                                                    <p class="mb-0"><strong>Total:</strong> MYR {{ selectedOrder.total.toFixed(2) }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold">Shipping Information</h6>
+                                                    <p class="mb-1" v-if="selectedOrder.shipping">
+                                                        {{ selectedOrder.shipping.address }}<br>
+                                                        {{ selectedOrder.shipping.city }}, {{ selectedOrder.shipping.state }} {{ selectedOrder.shipping.zip }}
+                                                    </p>
+                                                    <h6 class="fw-bold mt-3">Payment Method</h6>
+                                                    <p class="mb-0" v-if="selectedOrder.payment">
+                                                        <i :class="getCardIcon(selectedOrder.payment.method)" class="me-2"></i>
+                                                        {{ selectedOrder.payment.method }} •••• {{ selectedOrder.payment.last4 }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Order items -->
+                                            <h6 class="fw-bold mb-3">Items Ordered</h6>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Product</th>
+                                                            <th>Price</th>
+                                                            <th>Quantity</th>
+                                                            <th class="text-end">Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(item, index) in selectedOrder.items" :key="index">
+                                                            <td>
+                                                                <div class="d-flex align-items-center">
+                                                                    <img :src="item.image" alt="Product" class="me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                                                    <div>
+                                                                        <p class="mb-0 fw-medium">{{ item.name }}</p>
+                                                                        <small class="text-muted" v-if="item.material">Material: {{ item.material }}</small>
+                                                                        <small class="text-muted d-block" v-if="item.gemstone">Gemstone: {{ item.gemstone }}</small>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>MYR {{ item.price.toFixed(2) }}</td>
+                                                            <td>{{ item.quantity }}</td>
+                                                            <td class="text-end">MYR {{ (item.price * item.quantity).toFixed(2) }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="3" class="text-end fw-bold">Subtotal:</td>
+                                                            <td class="text-end">MYR {{ calculateSubtotal(selectedOrder.items).toFixed(2) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="3" class="text-end">Shipping:</td>
+                                                            <td class="text-end">MYR {{ calculateShipping(selectedOrder.items).toFixed(2) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="3" class="text-end">Tax (6%):</td>
+                                                            <td class="text-end">MYR {{ (calculateSubtotal(selectedOrder.items) * 0.06).toFixed(2) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="3" class="text-end fw-bold">Total:</td>
+                                                            <td class="text-end fw-bold">MYR {{ selectedOrder.total.toFixed(2) }}</td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                            
+                                            <div class="alert alert-info mt-3" v-if="selectedOrder.status === 'Processing'">
+                                                <i class="bi bi-info-circle me-2"></i>
+                                                Your order is being processed. You'll receive a shipping confirmation email when your items are on the way.
+                                            </div>
+                                            <div class="alert alert-success mt-3" v-if="selectedOrder.status === 'Shipped'">
+                                                <i class="bi bi-box-seam me-2"></i>
+                                                Your order has been shipped! You can track your package with tracking number: <strong>{{ selectedOrder.trackingNumber || 'TRK'+selectedOrder.id+'XYZ' }}</strong>
+                                            </div>
+                                            <div class="alert alert-secondary mt-3" v-if="selectedOrder.status === 'Delivered'">
+                                                <i class="bi bi-check-circle me-2"></i>
+                                                Your order was delivered on {{ formatDeliveryDate(selectedOrder) }}. We hope you're enjoying your purchase!
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary" @click="reorderItems">
+                                                <i class="bi bi-cart-plus me-1"></i> Reorder Items
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                    <!-- Addresses Tab -->
+                    <div class="tab-pane fade" id="addresses" role="tabpanel">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4">
+                                <h5 class="mb-4">Shipping Addresses</h5>
+                                
+                                <div class="row g-3" v-if="user.addresses && user.addresses.length > 0">
+                                    <div class="col-md-6" v-for="(address, index) in user.addresses" :key="index">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title mb-0">
+                                                        {{ address.name }}
+                                                        <span class="badge bg-primary ms-1" v-if="address.default">Default</span>
+                                                    </h6>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-link text-muted" type="button" data-bs-toggle="dropdown">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li><a class="dropdown-item" href="#" @click.prevent="editAddress(address)">Edit</a></li>
+                                                            <li v-if="!address.default"><a class="dropdown-item" href="#" @click.prevent="setDefaultAddress(index)">Set as Default</a></li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li><a class="dropdown-item text-danger" href="#" @click.prevent="deleteAddress(index)">Delete</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <p class="card-text mb-1">{{ address.street }}</p>
+                                                <p class="card-text mb-1">{{ address.city }}, {{ address.state }} {{ address.zip }}</p>
+                                                <p class="card-text mb-1">{{ address.country }}</p>
+                                                <p class="card-text mb-0"><i class="bi bi-telephone me-1"></i> {{ address.phone }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center py-4" v-else>
+                                    <div class="empty-state">
+                                        <i class="bi bi-geo-alt display-4 text-muted"></i>
+                                        <p class="mt-3 mb-0">You haven't added any shipping addresses yet.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button class="btn btn-primary" @click="showAddAddressModal">
+                                        <i class="bi bi-plus-circle me-1"></i> Add New Address
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Methods Tab -->
+                    <div class="tab-pane fade" id="payment-methods" role="tabpanel">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4">
+                                <h5 class="mb-4">Saved Payment Methods</h5>
+                                
+                                <div class="row g-3" v-if="user.paymentMethods && user.paymentMethods.length > 0">
+                                    <div class="col-md-6" v-for="(payment, index) in user.paymentMethods" :key="index">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title mb-0 d-flex align-items-center">
+                                                        <i :class="getCardIcon(payment.type)" class="me-2"></i>
+                                                        {{ payment.type }} •••• {{ payment.lastFour }}
+                                                        <span class="badge bg-primary ms-2" v-if="payment.default">Default</span>
+                                                    </h6>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-link text-muted" type="button" data-bs-toggle="dropdown">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li v-if="!payment.default"><a class="dropdown-item" href="#" @click.prevent="setDefaultPayment(index)">Set as Default</a></li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li><a class="dropdown-item text-danger" href="#" @click.prevent="deletePayment(index)">Delete</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <p class="card-text mb-1">{{ payment.name }}</p>
+                                                <p class="card-text mb-0">Expires: {{ payment.expMonth }}/{{ payment.expYear }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center py-4" v-else>
+                                    <div class="empty-state">
+                                        <i class="bi bi-credit-card display-4 text-muted"></i>
+                                        <p class="mt-3 mb-0">You haven't added any payment methods yet.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button class="btn btn-primary" @click="showAddPaymentModal">
+                                        <i class="bi bi-plus-circle me-1"></i> Add Payment Method
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Settings Tab -->
+                    <div class="tab-pane fade" id="account-settings" role="tabpanel">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4">
+                                <h5 class="mb-4">Account Settings</h5>
+                                
+                                <form @submit.prevent="updateAccountSettings">
+                                    <div class="mb-4">
+                                        <h6>Email Preferences</h6>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="orderUpdates" v-model="user.preferences.emailOrderUpdates">
+                                            <label class="form-check-label" for="orderUpdates">
+                                                Order updates and shipping notifications
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="promotions" v-model="user.preferences.emailPromotions">
+                                            <label class="form-check-label" for="promotions">
+                                                Promotions, discounts, and special offers
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="newProducts" v-model="user.preferences.emailNewProducts">
+                                            <label class="form-check-label" for="newProducts">
+                                                New product announcements
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Privacy Settings</h6>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="dataSharingConsent" v-model="user.preferences.dataSharingConsent">
+                                            <label class="form-check-label" for="dataSharingConsent">
+                                                I consent to sharing my shopping data to improve product recommendations
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Password</h6>
+                                        <p class="text-muted small mb-3">Update your password to keep your account secure.</p>
+                                        <button type="button" class="btn btn-outline-primary" @click="showChangePasswordModal">
+                                            Change Password
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6 class="text-danger">Danger Zone</h6>
+                                        <p class="text-muted small mb-3">Once you delete your account, there is no going back. Please be certain.</p>
+                                        <button type="button" class="btn btn-outline-danger" @click="showDeleteAccountModal">
+                                            Delete Account
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+                                            <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form @submit.prevent="changePassword">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" v-model="passwordForm.current" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" v-model="passwordForm.new" required>
+                        <div class="form-text">Password should be at least 8 characters long.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirm" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="changePassword" :disabled="isSubmittingPassword">
+                    <span v-if="isSubmittingPassword" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Change Password
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.
+                </div>
+                <p>Please type <strong>DELETE</strong> to confirm:</p>
+                <input type="text" class="form-control" v-model="deleteConfirmation" placeholder="Type DELETE to confirm">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" @click="deleteAccount" :disabled="deleteConfirmation !== 'DELETE' || isDeletingAccount">
+                    <span v-if="isDeletingAccount" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Method Modal -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Payment Method</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form @submit.prevent="savePaymentMethod">
+                    <div class="mb-3">
+                        <label for="cardType" class="form-label">Card Type</label>
+                        <select class="form-select" id="cardType" v-model="paymentForm.type" required>
+                            <option value="">Select Card Type</option>
+                            <option value="Visa">Visa</option>
+                            <option value="Mastercard">Mastercard</option>
+                            <option value="American Express">American Express</option>
+                            <option value="Discover">Discover</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardName" class="form-label">Name on Card</label>
+                        <input type="text" class="form-control" id="cardName" v-model="paymentForm.name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardNumber" class="form-label">Card Number</label>
+                        <input type="text" class="form-control" id="cardNumber" v-model="paymentForm.number" @input="formatCardNumber" maxlength="19" placeholder="XXXX XXXX XXXX XXXX" required>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label for="expiryMonth" class="form-label">Expiry Month</label>
+                            <select class="form-select" id="expiryMonth" v-model="paymentForm.expMonth" required>
+                                <option value="">MM</option>
+                                <option v-for="month in 12" :key="month" :value="month < 10 ? '0' + month : month.toString()">
+                                    {{ month < 10 ? '0' + month : month }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="expiryYear" class="form-label">Expiry Year</label>
+                            <select class="form-select" id="expiryYear" v-model="paymentForm.expYear" required>
+                                <option value="">YYYY</option>
+                                <option v-for="year in 10" :key="year" :value="(new Date().getFullYear() + year - 1).toString()">
+                                    {{ new Date().getFullYear() + year - 1 }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cvv" class="form-label">CVV</label>
+                        <input type="text" class="form-control" id="cvv" v-model="paymentForm.cvv" maxlength="4" required>
+                        <div class="form-text">3 or 4 digits usually found on the back of your card.</div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="defaultPayment" v-model="paymentForm.default">
+                        <label class="form-check-label" for="defaultPayment">
+                            Set as default payment method
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="savePaymentMethod" :disabled="isSubmittingPayment">
+                    <span v-if="isSubmittingPayment" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Add Payment Method
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Arcanes</h5>
+                        <p class="mb-4">Crafting timeless jewelry and accessories that celebrate life's special moments and everyday elegance with exceptional quality and design.</p>
+                        <div class="d-flex mb-4">
+                            <a href="https://www.facebook.com/" class="social-icon" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/" class="social-icon" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="https://x.com/home" class="social-icon" target="_blank"><i class="bi bi-twitter"></i></a>
+                            <a href="https://www.pinterest.com/" class="social-icon" target="_blank"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Shop</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="products.html" class="footer-link">All Jewelry</a></li>
+                            <li><a href="products.html#/?category=necklaces" class="footer-link">Necklaces</a></li>
+                            <li><a href="products.html#/?category=rings" class="footer-link">Rings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Earrings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Bracelets</a></li>
+                            <li><a href="products.html#/?category=watches" class="footer-link">Watches</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Company</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="about.html" class="footer-link" target="_blank">About Us</a></li>
+                            <li><a href="Contact.html" class="footer-link" target="_blank">Contact</a></li>
+                            <li><a href="about.html" class="footer-link" target="_blank">FAQ</a></li>
+                            <li><a href="https://www.google.com/maps" class="footer-link" target="_blank">Store Locations</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Contact Us</h5>
+                        <div class="contact-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>75 Jalan Pending, Kuching, Sarawak, Malaysia</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>+60 12-421 2206</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-envelope"></i>
+                            <span>104386924@students.swinburne.edu.my</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-md-0">© 2025 Arcanes. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Privacy Policy</a>
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Terms of Service</a>
+                            <a href="About.html" class="footer-link d-inline-block" target="_blank">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+
+<!-- Modals -->
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ editingAddress ? 'Edit Address' : 'Add New Address' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form @submit.prevent="saveAddress">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="addressName" class="form-label">Address Name</label>
+                            <input type="text" class="form-control" id="addressName" v-model="addressForm.name" placeholder="Home, Work, etc." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addressPhone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="addressPhone" v-model="addressForm.phone" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="addressStreet" class="form-label">Street Address</label>
+                            <input type="text" class="form-control" id="addressStreet" v-model="addressForm.street" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addressCity" class="form-label">City</label>
+                            <input type="text" class="form-control" id="addressCity" v-model="addressForm.city" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="addressState" class="form-label">State/Province</label>
+                            <input type="text" class="form-control" id="addressState" v-model="addressForm.state" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="addressZip" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="addressZip" v-model="addressForm.zip" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="addressCountry" class="form-label">Country</label>
+                            <select class="form-select" id="addressCountry" v-model="addressForm.country" required>
+                                <option value="">Select Country</option>
+                                <option value="Malaysia">Malaysia</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Singapore">Singapore</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="defaultAddress" v-model="addressForm.default">
+                                <label class="form-check-label" for="defaultAddress">
+                                    Set as default shipping address
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="saveAddress" :disabled="isSubmittingAddress">
+                    <span v-if="isSubmittingAddress" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    {{ editingAddress ? 'Update Address' : 'Add Address' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <!-- Script Section -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        <script>
+const { createApp, ref, reactive, computed, onMounted } = Vue;
+
+createApp({
+    setup() {
+        // State variables
+        const isLoggedIn = ref(true);
+        const cartCount = ref(0);
+        const scrolled = ref(false);
+        const isSubmitting = ref(false);
+        const isSubmittingAddress = ref(false);
+        const isSubmittingPayment = ref(false);
+        const isSubmittingPassword = ref(false);
+        const isDeletingAccount = ref(false);
+        const editingAddress = ref(false);
+        const editingAddressIndex = ref(-1);
+        const deleteConfirmation = ref('');
+        const imagePreview = ref(null);
+        const showCamera = ref(false);
+        const cameraStream = ref(null);
+        const selectedOrder = ref(null);
+
+        const previewImage = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file type
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image file is too large. Please select an image smaller than 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.value = e.target.result;
+                showCamera.value = false; // Hide camera if it was active
+            };
+            reader.readAsDataURL(file);
+        };
+        
+        const activateCamera = async () => {
+            try {
+                showCamera.value = true;
+                
+                // Wait for Vue to update the DOM
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Access the camera
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user' }, 
+                    audio: false 
+                });
+                
+                // Display the stream
+                const videoElement = cameraStream.value;
+                if (videoElement) {
+                    videoElement.srcObject = stream;
+                }
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                alert('Could not access camera. Please make sure you have given permission to use the camera.');
+                showCamera.value = false;
+            }
+        };
+        
+        const capturePhoto = () => {
+            const videoElement = cameraStream.value;
+            if (!videoElement) return;
+            
+            // Create a canvas to capture the photo
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            
+            // Draw the video frame to the canvas
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            
+            // Convert to data URL and set as preview
+            imagePreview.value = canvas.toDataURL('image/jpeg');
+            
+            // Stop the camera stream
+            const stream = videoElement.srcObject;
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+            
+            showCamera.value = false;
+        };
+        
+        const saveProfilePic = () => {
+            if (!imagePreview.value) return;
+            
+            // Update the user's profile picture
+            user.profilePic = imagePreview.value;
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('userData', JSON.stringify(user));
+                console.log('Profile picture saved to localStorage');
+            } catch (error) {
+                // If the image is too big for localStorage
+                if (error.name === 'QuotaExceededError') {
+                    alert('The image is too large to store. Please select a smaller image.');
+                    return;
+                }
+                console.error('Error saving profile picture:', error);
+            }
+            
+            // Close the modal
+            const modalElement = document.getElementById('profilePicModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            
+            // Reset preview
+            imagePreview.value = null;
+            
+            alert('Profile picture updated successfully!');
+        };
+        
+        const showProfilePicModal = () => {
+            // Reset the preview when opening the modal
+            imagePreview.value = null;
+            showCamera.value = false;
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('profilePicModal'));
+            modal.show();
+        };
+
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+        
+        // Load user data from localStorage or use defaults
+        const loadUserData = () => {
+            const storedData = localStorage.getItem('userData');
+            
+            // Default template for user data
+            const defaultUserData = {
+                profilePic: 'https://randomuser.me/api/portraits/women/65.jpg',
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                birthdate: '',
+                gender: '',
+                orders: [],
+                addresses: [],
+                paymentMethods: [],
+                wishlist: [],
+                preferences: {
+                    emailOrderUpdates: true,
+                    emailPromotions: false,
+                    emailNewProducts: true,
+                    dataSharingConsent: false
+                }
+            };
+            
+            if (storedData) {
+                try {
+                    const userData = JSON.parse(storedData);
+                    console.log('Successfully loaded user data from localStorage:', userData);
+                    
+                    // Ensure all properties exist by merging with default template
+                    return {
+                        ...defaultUserData,
+                        ...userData,
+                        // Make sure nested objects are also merged properly
+                        preferences: {
+                            ...defaultUserData.preferences,
+                            ...userData.preferences
+                        }
+                    };
+                } catch (error) {
+                    console.error('Error parsing user data from localStorage:', error);
+                }
+            }
+            
+            console.log('No user data found, using default values');
+            return {...defaultUserData};
+        };
+        
+        // Use the loaded data for the user object
+        const user = reactive(loadUserData());
+        
+        // Form for address
+        const addressForm = reactive({
+            name: '',
+            phone: '',
+            street: '',
+            city: '',
+            state: '',
+            zip: '',
+            country: '',
+            default: false
+        });
+        
+        // Form for payment
+        const paymentForm = reactive({
+            type: '',
+            name: '',
+            number: '',
+            expMonth: '',
+            expYear: '',
+            cvv: '',
+            default: false
+        });
+        
+        // Form for password change
+        const passwordForm = reactive({
+            current: '',
+            new: '',
+            confirm: ''
+        });
+        
+        // Computed properties
+        const recentOrders = computed(() => {
+            if (!user.orders || !Array.isArray(user.orders)) return [];
+            return user.orders.slice(0, 3);
+        });
+        
+        const recentWishlist = computed(() => {
+            if (!user.wishlist || !Array.isArray(user.wishlist)) return [];
+            return user.wishlist.slice(0, 3);
+        });
+        
+        // Central save function
+        const saveUserData = () => {
+            try {
+                localStorage.setItem('userData', JSON.stringify(user));
+                console.log('User data saved to localStorage:', user);
+            } catch (error) {
+                console.error('Error saving user data:', error);
+            }
+        };
+        
+        // Methods
+        const updatePersonalInfo = async () => {
+            isSubmitting.value = true;
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Save changes using the central function
+                saveUserData();
+                
+                alert('Personal information updated successfully!');
+            } catch (error) {
+                console.error('Error updating personal info:', error);
+                alert('There was an error updating your information. Please try again.');
+            } finally {
+                isSubmitting.value = false;
+            }
+        };
+        
+        const updateAccountSettings = async () => {
+            isSubmitting.value = true;
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Save changes using the central function
+                saveUserData();
+                
+                alert('Account settings updated successfully!');
+            } finally {
+                isSubmitting.value = false;
+            }
+        };
+        
+        const showAddAddressModal = () => {
+            // Reset form
+            Object.keys(addressForm).forEach(key => {
+                addressForm[key] = key === 'default' ? false : '';
+            });
+            editingAddress.value = false;
+            editingAddressIndex.value = -1;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+            modal.show();
+        };
+        
+        const editAddress = (address) => {
+            // Populate form with address data
+            Object.keys(addressForm).forEach(key => {
+                addressForm[key] = address[key];
+            });
+            
+            editingAddress.value = true;
+            editingAddressIndex.value = user.addresses.findIndex(a => a === address);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+            modal.show();
+        };
+        
+        const saveAddress = async () => {
+            isSubmittingAddress.value = true;
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                if (editingAddress.value) {
+                    // Update existing address
+                    if (addressForm.default) {
+                        // Set all other addresses as non-default
+                        user.addresses.forEach(addr => addr.default = false);
+                    }
+                    
+                    // Update the address at the index
+                    Object.keys(addressForm).forEach(key => {
+                        user.addresses[editingAddressIndex.value][key] = addressForm[key];
+                    });
+                    
+                    alert('Address updated successfully!');
+                } else {
+                    // Add new address
+                    if (addressForm.default) {
+                        // Set all other addresses as non-default
+                        user.addresses.forEach(addr => addr.default = false);
+                    }
+                    
+                    // Add the new address
+                    user.addresses.push({...addressForm});
+                    
+                    alert('Address added successfully!');
+                }
+                
+                // Close modal
+                const modalElement = document.getElementById('addAddressModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+            } catch (error) {
+                console.error('Error saving address:', error);
+                alert('There was an error saving your address. Please try again.');
+            } finally {
+                isSubmittingAddress.value = false;
+            }
+            saveUserData();
+        };
+        
+        const setDefaultAddress = async (index) => {
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Set all addresses as non-default
+                user.addresses.forEach(addr => addr.default = false);
+                
+                // Set the selected address as default
+                user.addresses[index].default = true;
+                
+                alert('Default address updated!');
+            } catch (error) {
+                console.error('Error setting default address:', error);
+                alert('There was an error setting your default address. Please try again.');
+            }
+            saveUserData();
+        };
+        
+        const deleteAddress = async (index) => {
+            if (confirm('Are you sure you want to delete this address?')) {
+                try {
+                    // Simulate API request
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Remove the address at the index
+                    user.addresses.splice(index, 1);
+                    
+                    alert('Address deleted successfully!');
+                } catch (error) {
+                    console.error('Error deleting address:', error);
+                    alert('There was an error deleting your address. Please try again.');
+                }
+            }
+            saveUserData();
+        };
+        
+        const showAddPaymentModal = () => {
+            // Reset form
+            Object.keys(paymentForm).forEach(key => {
+                paymentForm[key] = key === 'default' ? false : '';
+            });
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('addPaymentModal'));
+            modal.show();
+        };
+        
+        const formatCardNumber = () => {
+            // Format card number with spaces every 4 digits
+            paymentForm.number = paymentForm.number.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+        };
+        
+        const savePaymentMethod = async () => {
+            isSubmittingPayment.value = true;
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                if (paymentForm.default) {
+                    // Set all other payment methods as non-default
+                    user.paymentMethods.forEach(payment => payment.default = false);
+                }
+                
+                // Extract last 4 digits from card number
+                const lastFour = paymentForm.number.replace(/\s/g, '').slice(-4);
+                
+                // Add the new payment method
+                user.paymentMethods.push({
+                    type: paymentForm.type,
+                    name: paymentForm.name,
+                    lastFour,
+                    expMonth: paymentForm.expMonth,
+                    expYear: paymentForm.expYear,
+                    default: paymentForm.default
+                });
+                
+                alert('Payment method added successfully!');
+                
+                // Close modal
+                const modalElement = document.getElementById('addPaymentModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+            } catch (error) {
+                console.error('Error saving payment method:', error);
+                alert('There was an error saving your payment method. Please try again.');
+            } finally {
+                isSubmittingPayment.value = false;
+            }
+            saveUserData();
+        };
+        
+        const setDefaultPayment = async (index) => {
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Set all payment methods as non-default
+                user.paymentMethods.forEach(payment => payment.default = false);
+                
+                // Set the selected payment method as default
+                user.paymentMethods[index].default = true;
+                
+                alert('Default payment method updated!');
+            } catch (error) {
+                console.error('Error setting default payment method:', error);
+                alert('There was an error setting your default payment method. Please try again.');
+            }
+            saveUserData();
+        };
+        
+        const deletePayment = async (index) => {
+            if (confirm('Are you sure you want to delete this payment method?')) {
+                try {
+                    // Simulate API request
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Remove the payment method at the index
+                    user.paymentMethods.splice(index, 1);
+                    
+                    alert('Payment method deleted successfully!');
+                } catch (error) {
+                    console.error('Error deleting payment method:', error);
+                    alert('There was an error deleting your payment method. Please try again.');
+                }
+            }
+            saveUserData();
+        };
+        
+        const showChangePasswordModal = () => {
+            // Reset password form
+            passwordForm.current = '';
+            passwordForm.new = '';
+            passwordForm.confirm = '';
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            modal.show();
+        };
+        
+        const changePassword = async () => {
+            if (passwordForm.new !== passwordForm.confirm) {
+                alert('New passwords do not match');
+                return;
+            }
+            
+            if (passwordForm.new.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+            
+            isSubmittingPassword.value = true;
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // In a real app, you would send this to your backend
+                // For localStorage demo, we'll store a dummy password change timestamp
+                user.passwordLastChanged = new Date().toISOString();
+                localStorage.setItem('userData', JSON.stringify(user));
+                
+                alert('Password changed successfully!');
+                
+                // Close modal
+                const modalElement = document.getElementById('changePasswordModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+            } catch (error) {
+                console.error('Error changing password:', error);
+                alert('There was an error changing your password. Please try again.');
+            } finally {
+                isSubmittingPassword.value = false;
+            }
+        };
+        
+        const showDeleteAccountModal = () => {
+            // Reset delete confirmation
+            deleteConfirmation.value = '';
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+            modal.show();
+        };
+        
+        const deleteAccount = async () => {
+            if (deleteConfirmation.value !== 'DELETE') {
+                alert('Please type DELETE to confirm account deletion');
+                return;
+            }
+            
+            isDeletingAccount.value = true;
+            try {
+                // Simulate API request
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                alert('Your account has been deleted successfully. You will be redirected to the home page.');
+                
+                // Logout and redirect
+                localStorage.removeItem('userData');
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                alert('There was an error deleting your account. Please try again.');
+            } finally {
+                isDeletingAccount.value = false;
+            }
+        };
+        
+        const getCardIcon = (type) => {
+            const iconClass = 'bi bi-credit-card-fill';
+            switch (type?.toLowerCase()) {
+                case 'visa': return `${iconClass} visa`;
+                case 'mastercard': return `${iconClass} mastercard`;
+                case 'american express': return `${iconClass} amex`;
+                case 'discover': return `${iconClass} discover`;
+                default: return iconClass;
+            }
+        };
+        
+        // Order details functions
+        const viewOrderDetails = (order) => {
+            selectedOrder.value = order;
+            const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            modal.show();
+        };
+        
+        const calculateSubtotal = (items) => {
+            if (!items || !Array.isArray(items)) return 0;
+            return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+        };
+        
+        const calculateShipping = (items) => {
+            if (!items || !Array.isArray(items)) return 0;
+            const subtotal = calculateSubtotal(items);
+            return subtotal >= 500 ? 0 : 25; // Free shipping for orders over 500
+        };
+        
+        const formatDeliveryDate = (order) => {
+            if (!order.deliveryDate) {
+                // If no delivery date is set, create one based on the order date
+                const orderDate = new Date(order.date);
+                const deliveryDate = new Date(orderDate);
+                deliveryDate.setDate(orderDate.getDate() + 5); // Assume 5 days for delivery
+                return formatDate(deliveryDate.toISOString());
+            }
+            return formatDate(order.deliveryDate);
+        };
+        
+        const reorderItems = () => {
+            if (!selectedOrder.value || !selectedOrder.value.items) return;
+            
+            // Get current cart
+            let cart = [];
+            try {
+                const cartData = localStorage.getItem('cart');
+                if (cartData) {
+                    cart = JSON.parse(cartData);
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                cart = [];
+            }
+            
+            // Add all items from the order to the cart
+            selectedOrder.value.items.forEach(item => {
+                // Check if item already exists in cart
+                const existingItem = cart.find(cartItem => cartItem.id === item.id);
+                if (existingItem) {
+                    existingItem.quantity += item.quantity;
+                } else {
+                    cart.push({...item});
+                }
+            });
+            
+            // Save updated cart
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Update cart count and close modal
+            loadCartCount();
+            
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
+            modal.hide();
+            
+            // Show confirmation
+            alert('Items have been added to your cart!');
+            
+            // Redirect to cart page
+            window.location.href = 'cart.html';
+        };
+        
+        // Add or update loadCartCount function
+        const loadCartCount = () => {
+            const cart = localStorage.getItem('cart');
+            if (cart) {
+                try {
+                    const cartItems = JSON.parse(cart);
+                    cartCount.value = Array.isArray(cartItems) ? 
+                        cartItems.reduce((total, item) => total + (item.quantity || 0), 0) : 0;
+                    console.log('Cart count updated:', cartCount.value);
+                } catch (error) {
+                    console.error('Error parsing cart data:', error);
+                    cartCount.value = 0;
+                }
+            } else {
+                cartCount.value = 0;
+            }
+        };
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'cart') {
+                loadCartCount();
+            }
+        });
+                                
+        const logout = () => {
+            localStorage.removeItem('isLoggedIn');
+            alert('You have been logged out!');
+            window.location.href = 'index.html';
+        };
+        
+        const addToCart = (item) => {
+            // Get current cart from localStorage
+            let cart = [];
+            const cartData = localStorage.getItem('cart');
+            
+            if (cartData) {
+                try {
+                    cart = JSON.parse(cartData);
+                } catch (error) {
+                    console.error('Error parsing cart data:', error);
+                    cart = [];
+                }
+            }
+            
+            // Check if item already in cart
+            const existingItem = cart.find(i => i.id === item.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...item,
+                    quantity: 1
+                });
+            }
+            
+            // Save updated cart
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Update cart count
+            loadCartCount();
+            
+            alert(`${item.name} added to cart!`);
+        };
+        
+        const removeFromWishlist = (item) => {
+            const index = user.wishlist.findIndex(i => i.id === item.id);
+            if (index > -1) {
+                user.wishlist.splice(index, 1);
+                
+                // Save to localStorage
+                saveUserData();
+                
+                alert(`${item.name} removed from wishlist!`);
+            }
+        };
+        
+        onMounted(() => {
+            // Check if user is logged in from localStorage
+            const isUserLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            isLoggedIn.value = isUserLoggedIn;
+            
+            if (!isUserLoggedIn) {
+                alert('Please log in to access your account');
+                window.location.href = 'login.html';
+            }
+            
+            // Load cart count
+            loadCartCount();
+            
+            // Initialize AOS animation library
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            // Add scroll event listener for navbar
+            window.addEventListener('scroll', () => {
+                scrolled.value = window.scrollY > 50;
+            });
+            
+            // Back to top button functionality
+            const backToTopButton = document.getElementById('backToTopBtn');
+            
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    backToTopButton.style.display = 'flex';
+                } else {
+                    backToTopButton.style.display = 'none';
+                }
+            });
+            
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Save user data before leaving the page
+            window.addEventListener('beforeunload', () => {
+                saveUserData();
+            });
+
+            // Reload cart count when the page becomes visible again
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    // Page is now visible, reload the cart count
+                    loadCartCount();
+                }
+            });
+        });
+        
+        return {
+            isLoggedIn,
+            cartCount,
+            scrolled,
+            user,
+            addressForm,
+            paymentForm,
+            passwordForm,
+            isSubmitting,
+            formatDate,
+            isSubmittingAddress,
+            isSubmittingPayment,
+            isSubmittingPassword,
+            isDeletingAccount,
+            editingAddress,
+            deleteConfirmation,
+            recentOrders,
+            recentWishlist,
+            imagePreview,
+            showCamera,
+            cameraStream,
+            selectedOrder,
+            updatePersonalInfo,
+            updateAccountSettings,
+            showAddAddressModal,
+            editAddress,
+            saveAddress,
+            setDefaultAddress,
+            deleteAddress,
+            showAddPaymentModal,
+            formatCardNumber,
+            savePaymentMethod,
+            setDefaultPayment,
+            deletePayment,
+            showChangePasswordModal,
+            changePassword,
+            showDeleteAccountModal,
+            deleteAccount,
+            getCardIcon,
+            viewOrderDetails,
+            calculateSubtotal,
+            calculateShipping,
+            formatDeliveryDate,
+            reorderItems,
+            showProfilePicModal,
+            previewImage,
+            activateCamera,
+            capturePhoto,
+            saveProfilePic,
+            logout,
+            addToCart,
+            removeFromWishlist
+        };
+    }
+}).mount('#app');
+        </script>
+    </div>
+</body>
+</html>

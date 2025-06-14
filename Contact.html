@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanes | Contact Us</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Css/Index.css">
+    <link rel="stylesheet" href="Css/Contact.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3" :class="{'scrolled': scrolled}">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <i class="bi bi-gem me-2"></i>Arcanes
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="contact.html">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="cart.html">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                                <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge">
+                                    {{ cartCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <!-- When logged in, show My Account and Logout -->
+                        <template v-if="isLoggedIn">
+                            <li class="nav-item">
+                                <a class="nav-link" href="account.html">
+                                    <i class="bi bi-person-circle me-1"></i>My Account
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="#" @click.prevent="logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </li>
+                        </template>
+                        <!-- When NOT logged in, show Login & Register -->
+                        <template v-else>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.html">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="register.html">Register</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contact Header -->
+        <div class="contact-header text-center">
+            <div class="container">
+                <h1 data-aos="fade-up">Contact Us</h1>
+                <p data-aos="fade-up" data-aos-delay="100">We'd love to hear from you</p>
+            </div>
+        </div>
+
+        <!-- Contact Info & Form Section -->
+        <section class="contact-section py-5">
+            <div class="container">
+                <div class="row g-5">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <h2 class="section-title mb-4">Get In Touch</h2>
+                        <p class="lead mb-4">Have questions about our jewelry, interested in a custom piece, or need assistance with an order? We're here to help.</p>
+                        
+                        <div class="contact-info-items">
+                            <div class="contact-info-item d-flex align-items-start">
+                                <div class="icon-box">
+                                    <i class="bi bi-geo-alt"></i>
+                                </div>
+                                <div class="content">
+                                    <h5>Visit Our Store</h5>
+                                    <p>75 Jalan Pending<br>Kuching, Sarawak, Malaysia</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item d-flex align-items-start">
+                                <div class="icon-box">
+                                    <i class="bi bi-telephone"></i>
+                                </div>
+                                <div class="content">
+                                    <h5>Call Us</h5>
+                                    <p>+60 12-421 2206</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item d-flex align-items-start">
+                                <div class="icon-box">
+                                    <i class="bi bi-envelope"></i>
+                                </div>
+                                <div class="content">
+                                    <h5>Email Us</h5>
+                                    <p>104386924@students.swinburne.edu.my</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item d-flex align-items-start">
+                                <div class="icon-box">
+                                    <i class="bi bi-clock"></i>
+                                </div>
+                                <div class="content">
+                                    <h5>Business Hours</h5>
+                                    <p>Monday - Friday: 9:00 AM - 6:00 PM<br>
+                                    Saturday: 10:00 AM - 4:00 PM<br>
+                                    Sunday: Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="social-links mt-4">
+                            <h5>Follow Us</h5>
+                            <div class="d-flex social-icons">
+                                <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+                                <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+                                <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+                                <a href="#" class="social-icon"><i class="bi bi-pinterest"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <div class="contact-form-wrapper">
+                            <h3 class="form-title mb-4">Send Us a Message</h3>
+                            
+                            <!-- Success Message (shown after form submission) -->
+                            <div v-if="formSubmitted" class="alert alert-success" role="alert">
+                                <i class="bi bi-check-circle me-2"></i> Thank you for your message! We'll get back to you shortly.
+                            </div>
+                            
+                            <!-- Contact Form -->
+                            <form v-else @submit.prevent="submitForm" class="contact-form">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="name" placeholder="Your Name" v-model="form.name" required>
+                                            <label for="name">Your Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control" id="email" placeholder="Your Email" v-model="form.email" required>
+                                            <label for="email">Your Email</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="subject" placeholder="Subject" v-model="form.subject" required>
+                                            <label for="subject">Subject</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="inquiryType" v-model="form.inquiryType" required>
+                                                <option value="" disabled selected>Select an option (Inquiry Type)</option>
+                                                <option value="general">General Inquiry</option>
+                                                <option value="product">Product Question</option>
+                                                <option value="custom">Custom Order Request</option>
+                                                <option value="wholesale">Wholesale Inquiry</option>
+                                                <option value="support">Customer Support</option>
+                                            </select>
+                                            <label for="inquiryType"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" placeholder="Your Message" id="message" style="height: 150px" v-model="form.message" required></textarea>
+                                            <label for="message">Your Message</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- File Upload Section -->
+                                    <div class="col-12 mb-3">
+                                        <label for="fileUpload" class="form-label">Attach Files (Optional)</label>
+                                        <input class="form-control" type="file" id="fileUpload" ref="fileInput" @change="handleFileUpload" multiple>
+                                        <div class="form-text">You can upload images, documents, or PDFs (Max. 5MB per file)</div>
+                                        
+                                        <!-- Preview of uploaded files -->
+                                        <div v-if="selectedFiles.length > 0" class="mt-3">
+                                            <p class="mb-2"><strong>Selected Files:</strong></p>
+                                            <div class="selected-files-list">
+                                                <div v-for="(file, index) in selectedFiles" :key="index" class="selected-file">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi" :class="getFileIcon(file)"></i>
+                                                        <span class="ms-2">{{ file.name }} ({{ formatFileSize(file.size) }})</span>
+                                                        <button type="button" class="btn btn-sm text-danger ms-auto" @click="removeFile(index)">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="newsletter" v-model="form.newsletter">
+                                            <label class="form-check-label" for="newsletter">
+                                                Subscribe to our newsletter for updates and exclusive offers
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary w-100" :disabled="formLoading">
+                                            <span v-if="formLoading">
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                Sending...
+                                            </span>
+                                            <span v-else>Send Message</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Location Map Section -->
+        <section class="map-section py-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-12 col-md-11" data-aos="fade-up" data-aos-delay="100">
+                        <div class="card h-100 shadow-sm mx-auto">
+                            <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Find Us</h5>
+                            </div>
+                            <div class="card-body pt-2">
+                                <div class="map-container" style="height: 250px; border-radius: 6px; overflow: hidden;">
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31863.84559684086!2d110.33289743476563!3d1.5572509999999982!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31fba7856b6c281d%3A0x9a7ae11e8acc2cc7!2sJalan%20Pending%2C%20Kuching%2C%20Sarawak%2C%20Malaysia!5e0!3m2!1sen!2sus!4v1623733420671!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0 text-center">
+                                <small>75 Jalan Pending, Kuching, Sarawak, Malaysia</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section py-5">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Find answers to common questions about our jewelry and services</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="accordion" id="faqAccordion1">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Do you offer custom jewelry design services?
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion1">
+                                    <div class="accordion-body">
+                                        Yes, we specialize in creating custom jewelry pieces tailored to your preferences. Whether you have a specific design in mind or need guidance, our designers will work closely with you to create a unique piece that reflects your style. Contact us to schedule a consultation.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        What is your return and exchange policy?
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion1">
+                                    <div class="accordion-body">
+                                        We accept returns and exchanges within 30 days of purchase for items in their original condition with proof of purchase. Custom-made pieces cannot be returned unless there's a manufacturing defect. Please contact us before returning any items.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        How do I care for my jewelry?
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion1">
+                                    <div class="accordion-body">
+                                        To maintain the beauty of your jewelry, store pieces separately to avoid scratches, remove before swimming or bathing, clean gently with a soft cloth, and have professional cleaning done annually. Different materials require specific care, so check the care instructions provided with your purchase.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="accordion" id="faqAccordion2">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                        What shipping methods do you offer?
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion2">
+                                    <div class="accordion-body">
+                                        We offer standard shipping (3-5 business days), express shipping (1-2 business days), and international shipping (7-14 business days). All orders are insured and require signature upon delivery. Free shipping is available for orders over RM500 within Malaysia.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFive">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                        Do you offer jewelry repair services?
+                                    </button>
+                                </h2>
+                                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion2">
+                                    <div class="accordion-body">
+                                        Yes, we provide professional jewelry repair services including chain soldering, stone replacement, ring resizing, clasp replacement, and polishing. We offer free estimates for all repairs. Pieces purchased from Arcanes have special warranty considerations.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingSix">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                        Are your materials ethically sourced?
+                                    </button>
+                                </h2>
+                                <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion2">
+                                    <div class="accordion-body">
+                                        We are committed to ethical practices and sustainability. All our gemstones and precious metals are sourced from suppliers who adhere to responsible mining practices. We use recycled metals when possible and ensure our diamonds are conflict-free and Kimberley Process certified.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fixed Custom Order CTA Section -->
+        <section class="cta-section py-5">
+            <div class="container">
+                <div class="row g-4 justify-content-center text-center">
+                    <!-- Custom Order CTA (Now Centered) -->
+                    <div class="col-lg-5 col-md-10" data-aos="fade-up">
+                        <div class="card h-100 shadow-sm cta-card mx-auto">
+                            <div class="card-body text-center p-4">
+                                <h3 class="card-title mb-3">Create Your Dream Jewelry</h3>
+                                <p class="card-text mb-3">Looking for something unique? Let us craft a custom piece just for you.</p>
+                                <a href="#" class="btn btn-primary">Request Custom Design</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <br>
+        <br>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Arcanes</h5>
+                        <p class="mb-4">Crafting timeless jewelry and accessories that celebrate life's special moments and everyday elegance with exceptional quality and design.</p>
+                        <div class="d-flex mb-4">
+                            <a href="https://www.facebook.com/" class="social-icon" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/" class="social-icon" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="https://x.com/home" class="social-icon" target="_blank"><i class="bi bi-twitter"></i></a>
+                            <a href="https://www.pinterest.com/" class="social-icon" target="_blank"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Shop</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="products.html" class="footer-link">All Jewelry</a></li>
+                            <li><a href="products.html#/?category=necklaces" class="footer-link">Necklaces</a></li>
+                            <li><a href="products.html#/?category=rings" class="footer-link">Rings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Earrings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Bracelets</a></li>
+                            <li><a href="products.html#/?category=watches" class="footer-link">Watches</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Company</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="about.html" class="footer-link" target="_blank">About Us</a></li>
+                            <li><a href="Contact.html" class="footer-link" target="_blank">Contact</a></li>
+                            <li><a href="about.html" class="footer-link" target="_blank">FAQ</a></li>
+                            <li><a href="https://www.google.com/maps" class="footer-link" target="_blank">Store Locations</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Contact Us</h5>
+                        <div class="contact-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>75 Jalan Pending, Kuching, Sarawak, Malaysia</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>+60 12-421 2206</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-envelope"></i>
+                            <span>104386924@students.swinburne.edu.my</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-md-0">© 2025 Arcanes. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Privacy Policy</a>
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Terms of Service</a>
+                            <a href="About.html" class="footer-link d-inline-block" target="_blank">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.prod.js"></script>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        const app = createApp({
+            setup() {
+                // State
+                const isLoggedIn = ref(false);
+                const scrolled = ref(false);
+                const cartCount = ref(0);
+                const formSubmitted = ref(false);
+                const formLoading = ref(false);
+                const selectedFiles = ref([]); // For file uploads
+                const form = ref({
+                    name: '',
+                    email: '',
+                    subject: '',
+                    inquiryType: '',
+                    message: '',
+                    newsletter: false
+                });
+
+                // Methods
+                const logout = () => {
+                    isLoggedIn.value = false;
+                    localStorage.setItem('isLoggedIn', 'false');
+                };
+
+                // File upload methods
+                const handleFileUpload = (event) => {
+                    const files = event.target.files;
+                    if (!files.length) return;
+                    
+                    // Check file size (5MB limit per file)
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert(`File "${file.name}" exceeds the 5MB size limit.`);
+                            event.target.value = ''; // Clear the input
+                            return;
+                        }
+                        selectedFiles.value.push(file);
+                    }
+                    
+                    // Clear the input so the same file can be selected again if removed
+                    event.target.value = '';
+                };
+                
+                const removeFile = (index) => {
+                    selectedFiles.value.splice(index, 1);
+                };
+                
+                const getFileIcon = (file) => {
+                    const type = file.type;
+                    if (type.includes('image')) return 'bi-file-image';
+                    if (type.includes('pdf')) return 'bi-file-pdf';
+                    if (type.includes('word') || type.includes('document')) return 'bi-file-word';
+                    if (type.includes('excel') || type.includes('sheet')) return 'bi-file-excel';
+                    return 'bi-file-earmark';
+                };
+                
+                const formatFileSize = (bytes) => {
+                    if (bytes < 1024) return bytes + ' bytes';
+                    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                    else return (bytes / 1048576).toFixed(1) + ' MB';
+                };
+
+                const submitForm = () => {
+                    formLoading.value = true;
+                    
+                    // In a real implementation, you'd use FormData to send files to a server
+                    const formData = new FormData();
+                    formData.append('name', form.value.name);
+                    formData.append('email', form.value.email);
+                    formData.append('subject', form.value.subject);
+                    formData.append('inquiryType', form.value.inquiryType);
+                    formData.append('message', form.value.message);
+                    formData.append('newsletter', form.value.newsletter);
+                    
+                    // Append files
+                    selectedFiles.value.forEach((file, index) => {
+                        formData.append(`file${index}`, file);
+                    });
+                    
+                    // Simulate form submission with a delay
+                    setTimeout(() => {
+                        console.log('Form submitted with files');
+                        // Log files (in a real app, you'd send formData to the server)
+                        console.log('Files to upload:', selectedFiles.value.map(f => f.name));
+                        
+                        formLoading.value = false;
+                        formSubmitted.value = true;
+                        
+                        // Reset form and files
+                        form.value = {
+                            name: '',
+                            email: '',
+                            subject: '',
+                            inquiryType: '',
+                            message: '',
+                            newsletter: false
+                        };
+                        selectedFiles.value = [];
+                    }, 1500);
+                };
+
+                // On component mounted
+                onMounted(() => {
+                    // Check if user is logged in from localStorage
+                    isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
+                    
+                    // Initialize cart count
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+                    
+                    // Initialize AOS animation library
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true
+                    });
+                    
+                    // Add scroll event listener for navbar
+                    window.addEventListener('scroll', () => {
+                        scrolled.value = window.scrollY > 50;
+                    });
+                    
+                    // Back to top button functionality
+                    const backToTopButton = document.getElementById('backToTopBtn');
+                    
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 300) {
+                            backToTopButton.style.display = 'flex';
+                        } else {
+                            backToTopButton.style.display = 'none';
+                        }
+                    });
+                    
+                    backToTopButton.addEventListener('click', function() {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                });
+
+                return {
+                    isLoggedIn,
+                    scrolled,
+                    cartCount,
+                    logout,
+                    form,
+                    submitForm,
+                    formSubmitted,
+                    formLoading,
+                    selectedFiles,
+                    handleFileUpload,
+                    removeFile,
+                    getFileIcon,
+                    formatFileSize
+                };
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>

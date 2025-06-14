@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanes | Products</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Others -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Css/Products.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3" :class="{'scrolled': scrolled}">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <i class="bi bi-gem me-2"></i>Arcanes
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="products.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="About.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Contact.html">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="cart.html">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                                <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge">
+                                    {{ cartCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <!-- When logged in, show My Account and Logout -->
+                        <template v-if="isLoggedIn">
+                            <li class="nav-item">
+                                <a class="nav-link" href="account.html">
+                                    <i class="bi bi-person-circle me-1"></i>My Account
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="#" @click.prevent="logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </li>
+                        </template>
+                        <!-- When NOT logged in, show Login & Register -->
+                        <template v-else>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.html">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="register.html">Register</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Products Header -->
+        <section class="products-header">
+            <div class="container text-center" data-aos="fade-up">
+                <h1>Exquisite Jewelry Collection</h1>
+                <p class="lead">Discover our handcrafted pieces made with the finest materials and unparalleled craftsmanship</p>
+            </div>
+        </section>
+
+        <!-- Products Main Content -->
+        <div class="container py-5">
+            <!-- Category Navigation -->
+            <div class="category-nav mb-4" data-aos="fade-up">
+                <ul class="nav justify-content-center">
+                    <li class="nav-item">
+                        <router-link class="nav-link" :class="{'active': currentCategory === ''}" :to="{ query: { category: '' }}">
+                            <i class="bi bi-grid"></i> All Jewelry
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link" :class="{'active': currentCategory === 'necklaces'}" :to="{ query: { category: 'necklaces' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 1.25em; height: 1.25em; vertical-align: -0.125em; fill: currentColor;">
+                                <path d="M366.48 118.392C338.282 92.537 299.046 78.298 256 78.298s-82.282 14.24-110.48 40.094c-30.096 27.597-46.004 66.136-46.004 111.452a185.743 185.743 0 0 0 9.383 58.624 5.5 5.5 0 1 0 10.44-3.465 174.775 174.775 0 0 1-8.823-55.16c0-42.15 14.674-77.885 42.44-103.343C179.117 102.51 215.713 89.298 256 89.298s76.882 13.212 103.045 37.202c27.765 25.457 42.44 61.193 42.44 103.344a174.757 174.757 0 0 1-8.814 55.128 5.5 5.5 0 0 0 10.442 3.463 185.76 185.76 0 0 0 9.372-58.591c0-45.316-15.909-83.855-46.005-111.452zM380.856 300.407a19.47 19.47 0 0 0-18.165 26.585 22.431 22.431 0 0 0-28.043 21.711c0 .589.03 1.17.074 1.748a29.413 29.413 0 0 0-42.734 14.793 44.035 44.035 0 0 0-72.352-1.55 29.398 29.398 0 0 0-42.372-13.067c.055-.635.088-1.275.088-1.924a22.418 22.418 0 0 0-28.23-21.658 19.551 19.551 0 1 0-14.44 12.023 22.413 22.413 0 0 0 29.352 30.12 29.412 29.412 0 0 0 47.94 28.717 44.084 44.084 0 0 0 86.835-1.364 29.418 29.418 0 0 0 49.451-27.22 22.418 22.418 0 0 0 29.068-30.225 19.506 19.506 0 1 0 3.526-38.69zm-249.88 28.025a8.512 8.512 0 1 1 8.513-8.513 8.521 8.521 0 0 1-8.512 8.513zm23.953 31.695a11.424 11.424 0 1 1 11.423-11.424 11.437 11.437 0 0 1-11.423 11.424zm37.818 33.954a18.435 18.435 0 1 1 18.435-18.435 18.456 18.456 0 0 1-18.435 18.435zm62.523 28.62a33.089 33.089 0 1 1 33.088-33.088 33.126 33.126 0 0 1-33.088 33.089zm64.249-28.62a18.435 18.435 0 1 1 18.434-18.435 18.455 18.455 0 0 1-18.434 18.435zm37.552-33.954a11.424 11.424 0 1 1 11.425-11.424 11.437 11.437 0 0 1-11.425 11.424zm23.784-31.695a8.512 8.512 0 1 1 8.513-8.513 8.521 8.521 0 0 1-8.512 8.513z"/>
+                            </svg>
+                            Necklaces
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link" :class="{'active': currentCategory === 'rings'}" :to="{ query: { category: 'rings' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" style="width: 1.25em; height: 1.25em; vertical-align: -0.125em; fill: currentColor;">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M60 35.998C60 51.463 47.463 64 32.001 64 16.537 64 4 51.463 4 35.998c0-12.734 8.508-23.463 20.148-26.862L20.01 4.999 25.011 0H38.99l5 4.999-4.139 4.138C51.49 12.535 60 23.264 60 35.998zM25.832 1.999 23.831 4h4l.538-2.001h-2.537zM27.894 6h-4.062l5.548 5.547L27.894 6zm4.107 10C20.955 16 12 24.954 12 35.998c0 11.047 8.954 20 20.001 20 11.045 0 20-8.953 20-20C52.002 24.954 43.047 16 32.001 16zm2.036-10h-4.074l2.038 7.604L34.037 6zm-4.133-2H34.1l-.537-2.001h-3.124L29.904 4zm8.264-2.001h-2.535L36.17 4h4l-2.002-2.001zm2 4.001h-4.061l-1.488 5.549L40.168 6zm-1.957 4.777-3.418 3.419C45.621 15.572 54 24.797 54 35.998 54 48.15 44.15 58 32.001 58 19.85 58 10 48.15 10 35.998c0-11.201 8.376-20.428 19.206-21.802l-3.418-3.419C14.434 13.565 6 23.786 6 35.998 6 50.359 17.641 62 32.001 62 46.359 62 58 50.359 58 35.998c0-12.212-8.434-22.433-19.789-25.221z"/>
+                            </svg>
+                            Rings
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link" :class="{'active': currentCategory === 'earrings'}" :to="{ query: { category: 'earrings' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" style="width: 1.25em; height: 1.25em; vertical-align: -0.125em; fill: currentColor;">
+                                <path d="M21.38 34.55a9.27 9.27 0 1 0 0 18.54 9.27 9.27 0 0 0 0-18.54zm0 16.54a7.27 7.27 0 1 1 0-14.54 7.27 7.27 0 0 1 0 14.54zM45.56 43.82a9.27 9.27 0 1 0 0 18.54 9.27 9.27 0 0 0 0-18.54zm0 16.54a7.27 7.27 0 1 1 0-14.54 7.27 7.27 0 0 1 0 14.54zM27.71 27.77l-6.41 6.42-6.41-6.42h12.82zm-13.05 0 6.64 6.65 6.64-6.65H14.66zM21.38 17.84a4.79 4.79 0 1 0 0 9.58 4.79 4.79 0 0 0 0-9.58zm0 7.58a2.79 2.79 0 1 1 0-5.58 2.79 2.79 0 0 1 0 5.58zM51.97 36.35l-6.41 6.41-6.41-6.41h12.82zm-13.05 0 6.64 6.65 6.64-6.65H38.92zM45.64 26.41a4.79 4.79 0 1 0 0 9.58 4.79 4.79 0 0 0 0-9.58zm0 7.58a2.79 2.79 0 1 1 0-5.58 2.79 2.79 0 0 1 0 5.58zM25.04 1.64s-.81 3.06-3.36 2.04c0 0-6.01-4.28-6.93 1.12 0 0-.2 3.87 4.38 3.77 0 0 1.94 1.02 2.24 2.85v6.42M21.37 11.42v6.42M49.44 11.02s-.81 3.06-3.36 2.04c0 0-6.01-4.28-6.93 1.12 0 0-.2 3.87 4.38 3.77 0 0 1.94 1.02 2.24 2.85v6.42M45.77 20.8v6.42"/>
+                            </svg>
+                            Earrings
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link" :class="{'active': currentCategory === 'bracelets'}" :to="{ query: { category: 'bracelets' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6.827 6.827" style="width: 1.25em; height: 1.25em; vertical-align: -0.125em; fill: currentColor;">
+                                <path d="M4.574 5.73a.107.107 0 0 0-.08-.198 2.03 2.03 0 1 1 .906-.727.106.106 0 0 0 .175.121 2.243 2.243 0 1 0-1.001.803z"/>
+                                <path d="M2.04 5.155a.106.106 0 0 0 .1-.188 2.029 2.029 0 0 1-.479-3.227 2.024 2.024 0 0 1 2.254-.422c.255.112.487.277.679.486a.106.106 0 0 0 .157-.143 2.243 2.243 0 1 0-2.71 3.494z"/>
+                                <path d="M1.87 1.531c.12 0 .232.036.313.095.093.066.15.16.15.266 0 .107-.057.201-.15.267a.544.544 0 0 1-.313.095.544.544 0 0 1-.314-.095.329.329 0 0 1-.15-.267c0-.106.058-.2.15-.266a.544.544 0 0 1 .314-.095zm.19.268a.33.33 0 0 0-.19-.055.33.33 0 0 0-.19.055c-.037.026-.06.06-.06.093 0 .034.023.068.06.094a.33.33 0 0 0 .19.054.33.33 0 0 0 .19-.054c.037-.026.06-.06.06-.094s-.023-.067-.06-.093zM1.395 2.515c.107 0 .206.033.28.085.083.06.135.145.135.242a.298.298 0 0 1-.135.243.485.485 0 0 1-.28.084.485.485 0 0 1-.28-.084.298.298 0 0 1-.135-.243c0-.097.052-.183.135-.242a.485.485 0 0 1 .28-.085zm.156.258a.271.271 0 0 0-.156-.044.271.271 0 0 0-.156.044c-.028.02-.046.045-.046.07 0 .024.018.048.046.068a.271.271 0 0 0 .156.045.271.271 0 0 0 .156-.045c.028-.02.046-.044.046-.069 0-.024-.018-.049-.046-.069zM2.86 1.029c.107 0 .206.032.279.084.084.06.135.146.135.243a.298.298 0 0 1-.135.242.485.485 0 0 1-.28.085.485.485 0 0 1-.28-.085.298.298 0 0 1-.135-.242c0-.097.052-.183.136-.243a.485.485 0 0 1 .28-.084zm.156.258a.271.271 0 0 0-.157-.045.271.271 0 0 0-.156.045c-.028.02-.045.044-.045.069 0 .024.017.049.045.069a.271.271 0 0 0 .156.044.271.271 0 0 0 .157-.044c.028-.02.045-.045.045-.07 0-.024-.017-.048-.045-.068z"/>
+                            </svg>
+                            Bracelets
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link" :class="{'active': currentCategory === 'watches'}" :to="{ query: { category: 'watches' }}">
+                            <i class="bi bi-watch"></i> Watches
+                        </router-link>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Active Filters -->
+            <div class="mb-4" v-if="hasActiveFilters" data-aos="fade-up">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="fw-bold">Active Filters:</span>
+                    <span v-if="currentCategory" class="filter-badge">
+                        Category: {{ capitalizeFirst(currentCategory) }} <i class="bi bi-x-circle" @click="clearCategoryFilter"></i>
+                    </span>
+                    <span v-if="priceRange[0] > 0 || priceRange[1] < 9999" class="filter-badge">
+                        Price: MYR{{ priceRange[0] }} - MYR{{ priceRange[1] }} <i class="bi bi-x-circle" @click="resetPriceFilter"></i>
+                    </span>
+                    <span v-for="material in selectedMaterials" :key="'m-'+material" class="filter-badge">
+                        Material: {{ capitalizeFirst(material) }} <i class="bi bi-x-circle" @click="removeMaterial(material)"></i>
+                    </span>
+                    <span v-for="gemstone in selectedGemstones" :key="'g-'+gemstone" class="filter-badge">
+                        Gemstone: {{ capitalizeFirst(gemstone) }} <i class="bi bi-x-circle" @click="removeGemstone(gemstone)"></i>
+                    </span>
+                    <button class="btn btn-sm btn-outline-secondary ms-auto" @click="clearAllFilters">
+                        Clear All Filters
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Filters Sidebar -->
+                <div class="col-lg-3">
+                    <div class="filters-sidebar" data-aos="fade-up">
+                        <h4>Refine Your Search</h4>
+                        
+                        <!-- Search Filter -->
+                        <div class="mb-4">
+                            <label for="search" class="form-label">Search</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="search" v-model="searchQuery" placeholder="Search jewelry...">
+                                <button class="btn btn-outline-secondary" type="button" @click="applySearch">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Price Range Filter -->
+                        <div class="mb-4">
+                            <h5>Price Range</h5>
+                            <div class="price-slider-container">
+                                <div id="price-slider" class="mt-3 mb-4"></div>
+                                <div class="price-values d-flex align-items-center justify-content-between">
+                                    <div class="input-group">
+                                        <span class="input-group-text">MYR</span>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            v-model.number="priceRange[0]" 
+                                            @change="updatePriceSlider"
+                                            min="0"
+                                            :max="priceRange[1]"
+                                            step="10"
+                                        >
+                                    </div>
+                                    <span class="mx-2 text-muted">to</span>
+                                    <div class="input-group">
+                                        <span class="input-group-text">MYR</span>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            v-model.number="priceRange[1]" 
+                                            @change="updatePriceSlider"
+                                            :min="priceRange[0]"
+                                            max="9999"
+                                            step="10"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Material Filter -->
+                        <div class="mb-4">
+                            <h5>Material</h5>
+                            <div class="form-check" v-for="material in materials" :key="material">
+                                <input class="form-check-input" type="checkbox" :id="'material-'+material" 
+                                       :value="material" v-model="selectedMaterials">
+                                <label class="form-check-label" :for="'material-'+material">
+                                    {{ capitalizeFirst(material) }}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Gemstone Filter -->
+                        <div class="mb-4">
+                            <h5>Gemstone</h5>
+                            <div class="form-check" v-for="gemstone in gemstones" :key="gemstone">
+                                <input class="form-check-input" type="checkbox" :id="'gemstone-'+gemstone" 
+                                       :value="gemstone" v-model="selectedGemstones">
+                                <label class="form-check-label" :for="'gemstone-'+gemstone">
+                                    {{ capitalizeFirst(gemstone) }}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Rating Filter -->
+                        <div class="mb-4">
+                            <h5>Rating</h5>
+                            <div class="form-check" v-for="rating in [4, 3, 2, 1]" :key="rating">
+                                <input class="form-check-input" type="radio" name="rating" :id="'rating-'+rating" 
+                                       :value="rating" v-model="minRating">
+                                <label class="form-check-label" :for="'rating-'+rating">
+                                    <div class="stars">
+                                        <i v-for="star in 5" :key="star" 
+                                           :class="star <= rating ? 'bi bi-star-fill' : 'bi bi-star'"></i>
+                                    </div>
+                                    <span v-if="rating < 5">& up</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" @click="clearAllFilters">
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Products Grid -->
+                <div class="col-lg-9">
+                    <!-- Sort and View Options -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <label for="sortOrder" class="me-2">Sort by:</label>
+                            <select id="sortOrder" class="form-select" style="width: auto;" v-model="sortOption">
+                                <option value="featured">Featured</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="rating">Customer Rating</option>
+                                <option value="newest">Newest Arrivals</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="me-2">{{ filteredProducts.length }} Products</span>
+                            <button class="btn btn-sm" :class="viewMode === 'grid' ? 'btn-primary' : 'btn-outline-primary'" @click="viewMode = 'grid'" aria-label="Grid view">
+                                <i class="bi bi-grid-3x3-gap-fill"></i>
+                            </button>
+                            <button class="btn btn-sm" :class="viewMode === 'list' ? 'btn-primary' : 'btn-outline-primary'" @click="viewMode = 'list'" aria-label="List view">
+                                <i class="bi bi-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div v-if="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Loading products...</p>
+                    </div>
+                    
+                    <!-- No Products Message -->
+                    <div v-else-if="filteredProducts.length === 0" class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-search" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3>No products found</h3>
+                        <p class="text-muted">Try adjusting your filters or search criteria</p>
+                        <button class="btn btn-primary" @click="clearAllFilters">Clear All Filters</button>
+                    </div>
+                    
+                    <!-- Grid View -->
+                    <div v-else-if="viewMode === 'grid'" class="row g-4">
+                        <div v-for="product in paginatedProducts" :key="product.id" class="col-md-6 col-lg-4" data-aos="fade-up">
+                            <div class="card product-card h-100">
+                                <div class="card-img-container">
+                                    <div class="card-badge" v-if="product.badge">{{ product.badge }}</div>
+                                    <img :src="product.image" class="card-img-top" :alt="product.name">
+                                    <div class="product-action">
+                                        <button class="btn btn-light btn-sm" title="Add to Wishlist" @click="toggleWishlist(product)">
+                                            <i class="bi" :class="product.inWishlist ? 'bi-heart-fill heart-active' : 'bi-heart'"></i>
+                                        </button>
+                                        <button class="btn btn-light btn-sm" title="Quick View" @click="showQuickView(product)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <div class="product-category">{{ capitalizeFirst(product.category) }}</div>
+                                    <h5 class="card-title">{{ product.name }}</h5>
+                                    <div class="product-rating mb-2">
+                                        <i v-for="star in 5" :key="star" class="bi" 
+                                           :class="star <= product.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                                        <span class="rating-count">({{ product.reviews }})</span>
+                                    </div>
+                                    <div class="product-price">
+                                        <span v-if="product.originalPrice > product.price" class="original-price">
+                                            MYR{{ formatPrice(product.originalPrice) }}
+                                        </span>
+                                        <span class="current-price">MYR{{ formatPrice(product.price) }}</span>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <button class="btn btn-primary w-100 mt-3" @click="addToCart(product)">
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- List View -->
+                    <div v-else-if="viewMode === 'list'">
+                        <div v-for="product in paginatedProducts" :key="product.id" class="card mb-3" data-aos="fade-up">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <div class="list-img-container">
+                                        <div class="card-badge" v-if="product.badge">{{ product.badge }}</div>
+                                        <img :src="product.image" class="img-fluid rounded-start h-100 w-100 object-fit-cover" :alt="product.name">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body h-100 d-flex flex-column">
+                                        <div class="product-category">{{ capitalizeFirst(product.category) }}</div>
+                                        <h4 class="card-title">{{ product.name }}</h4>
+                                        <div class="product-rating mb-2">
+                                            <i v-for="star in 5" :key="star" class="bi" 
+                                               :class="star <= product.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                                            <span class="rating-count">({{ product.reviews }})</span>
+                                        </div>
+                                        <p class="card-text">{{ product.description }}</p>
+                                        <div class="product-price mb-3">
+                                            <span v-if="product.originalPrice > product.price" class="original-price">
+                                                MYR{{ formatPrice(product.originalPrice) }}
+                                            </span>
+                                            <span class="current-price">MYR{{ formatPrice(product.price) }}</span>
+                                        </div>
+                                        <div class="product-features mb-3" v-if="product.features">
+                                            <ul class="list-unstyled">
+                                                <li v-for="feature in product.features" :key="feature">
+                                                    <i class="bi bi-check-circle-fill me-2 text-success"></i>{{ feature }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="mt-auto d-flex">
+                                            <button class="btn btn-primary flex-grow-1" @click="addToCart(product)">
+                                                Add to Cart
+                                            </button>
+                                            <button class="btn btn-outline-secondary ms-2" @click="toggleWishlist(product)">
+                                                <i class="bi" :class="product.inWishlist ? 'bi-heart-fill heart-active' : 'bi-heart'"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary ms-2" @click="showQuickView(product)">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav aria-label="Product pagination" class="my-4" v-if="filteredProducts.length > 0">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                <button class="page-link" @click="currentPage = 1" aria-label="First page">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </button>
+                            </li>
+                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                <button class="page-link" @click="currentPage--" aria-label="Previous page">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                            </li>
+                            <li v-for="page in visiblePageNumbers" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                                <button class="page-link" @click="currentPage = page" v-if="page !== '...'">{{ page }}</button>
+                                <span class="page-link" v-else>{{ page }}</span>
+                            </li>
+                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                <button class="page-link" @click="currentPage++" aria-label="Next page">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </li>
+                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                <button class="page-link" @click="currentPage = totalPages" aria-label="Last page">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick View Modal -->
+        <div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content" v-if="selectedProduct">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ selectedProduct.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img :src="selectedProduct.image" class="img-fluid rounded" :alt="selectedProduct.name">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="product-category">{{ capitalizeFirst(selectedProduct.category) }}</div>
+                                <div class="product-rating my-2">
+                                    <i v-for="star in 5" :key="star" class="bi" 
+                                       :class="star <= selectedProduct.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                                    <span class="rating-count">({{ selectedProduct.reviews }})</span>
+                                </div>
+                                <div class="product-price mb-3">
+                                    <span v-if="selectedProduct.originalPrice > selectedProduct.price" class="original-price">
+                                        MYR{{ formatPrice(selectedProduct.originalPrice) }}
+                                    </span>
+                                    <span class="current-price">MYR{{ formatPrice(selectedProduct.price) }}</span>
+                                </div>
+                                <p class="mb-3">{{ selectedProduct.description }}</p>
+                                
+                                <div class="mb-3" v-if="selectedProduct.features">
+                                    <h6>Features:</h6>
+                                    <ul class="list-unstyled">
+                                        <li v-for="feature in selectedProduct.features" :key="feature">
+                                            <i class="bi bi-check-circle-fill me-2 text-success"></i>{{ feature }}
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="input-group input-group-sm me-3" style="width: 110px;">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" @click="decrementQuantity">-</button>
+                                        <input type="number" class="form-control form-control-sm text-center" v-model.number="quantity" min="1">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" @click="incrementQuantity">+</button>
+                                    </div>
+                                    <button class="btn btn-primary" @click="addToCartWithQuantity(selectedProduct)">
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Arcanes</h5>
+                        <p class="mb-4">Crafting timeless jewelry and accessories that celebrate life's special moments and everyday elegance with exceptional quality and design.</p>
+                        <div class="d-flex mb-4">
+                            <a href="https://www.facebook.com/" class="social-icon" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/" class="social-icon" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="https://x.com/home" class="social-icon" target="_blank"><i class="bi bi-twitter"></i></a>
+                            <a href="https://www.pinterest.com/" class="social-icon" target="_blank"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Shop</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="products.html" class="footer-link">All Jewelry</a></li>
+                            <li><a href="products.html#/?category=necklaces" class="footer-link">Necklaces</a></li>
+                            <li><a href="products.html#/?category=rings" class="footer-link">Rings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Earrings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Bracelets</a></li>
+                            <li><a href="products.html#/?category=watches" class="footer-link">Watches</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Company</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="about.html" class="footer-link" target="_blank">About Us</a></li>
+                            <li><a href="Contact.html" class="footer-link" target="_blank">Contact</a></li>
+                            <li><a href="about.html" class="footer-link" target="_blank">FAQ</a></li>
+                            <li><a href="https://www.google.com/maps" class="footer-link" target="_blank">Store Locations</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Contact Us</h5>
+                        <div class="contact-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>75 Jalan Pending, Kuching, Sarawak, Malaysia</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>+60 12-421 2206</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-envelope"></i>
+                            <span>104386924@students.swinburne.edu.my</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-md-0">© 2025 Arcanes. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Privacy Policy</a>
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Terms of Service</a>
+                            <a href="About.html" class="footer-link d-inline-block" target="_blank">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery for price slider -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <!-- Vue Router -->
+    <script src="https://unpkg.com/vue-router@4.0.15/dist/vue-router.global.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Main JS -->
+    <script>
+        const { createApp, ref, computed, reactive, onMounted, watch, nextTick } = Vue;
+        
+        // Create router
+        const router = VueRouter.createRouter({
+            history: VueRouter.createWebHashHistory(), // Using hash mode for simplicity
+            routes: [
+                { 
+                    path: '/', 
+                    component: { template: '<div></div>' } // Empty component since we're not using full routing
+                }
+            ]
+        });
+        
+        // Create and mount the app
+        const app = createApp({
+            setup() {
+                // State variables
+                const isLoggedIn = ref(false);
+                const cartCount = ref(0);
+                const scrolled = ref(false);
+                const loading = ref(true);
+                const searchQuery = ref('');
+                const currentCategory = ref('');
+                const priceRange = ref([0, 9999]);
+                const selectedMaterials = ref([]);
+                const selectedGemstones = ref([]);
+                const minRating = ref(0);
+                const sortOption = ref('featured');
+                const viewMode = ref('grid');
+                const currentPage = ref(1);
+                const itemsPerPage = ref(12);
+                const quantity = ref(1);
+                const selectedProduct = ref(null);
+                
+                // Product data
+                const products = ref([]);
+                const materials = ref([]);
+                const gemstones = ref([]);
+                
+                // Function to fetch product data from JSON file
+                const fetchProducts = async () => {
+                    try {
+                        loading.value = true;
+                        const response = await fetch('products.json');
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        products.value = data.products || [];
+                        
+                        // Extract unique materials and gemstones from the products
+                        const uniqueMaterials = new Set();
+                        const uniqueGemstones = new Set();
+                        
+                        products.value.forEach(product => {
+                            if (product.material) uniqueMaterials.add(product.material);
+                            if (product.gemstone && product.gemstone !== '') uniqueGemstones.add(product.gemstone);
+                            
+                            // Initialize wishlist state
+                            product.inWishlist = false;
+                        });
+                        
+                        materials.value = Array.from(uniqueMaterials);
+                        gemstones.value = Array.from(uniqueGemstones);
+                        
+                        console.log(`Loaded ${products.value.length} products from JSON file`);
+                    } catch (error) {
+                        console.error('Error loading products:', error);
+                        alert('Failed to load products. Please try again later.');
+                    } finally {
+                        // Remove the timeout to ensure products load immediately
+                        loading.value = false;
+                    }
+                };
+                
+                // Computed properties
+                const hasActiveFilters = computed(() => {
+                    return currentCategory.value !== '' || 
+                           priceRange.value[0] > 0 || 
+                           priceRange.value[1] < 9999 || 
+                           selectedMaterials.value.length > 0 || 
+                           selectedGemstones.value.length > 0 || 
+                           minRating.value > 0 ||
+                           searchQuery.value !== '';
+                });
+                
+                const filteredProducts = computed(() => {
+                    let result = [...products.value];
+                    
+                    // Apply search filter
+                    if (searchQuery.value.trim()) {
+                        const query = searchQuery.value.trim().toLowerCase();
+                        result = result.filter(product => 
+                            product.name.toLowerCase().includes(query) || 
+                            product.description.toLowerCase().includes(query)
+                        );
+                    }
+                    
+                    // Apply category filter
+                    if (currentCategory.value) {
+                        result = result.filter(product => product.category === currentCategory.value);
+                    }
+                    
+                    // Apply price range filter
+                    result = result.filter(product => 
+                        product.price >= priceRange.value[0] && product.price <= priceRange.value[1]
+                    );
+                    
+                    // Apply material filter
+                    if (selectedMaterials.value.length > 0) {
+                        result = result.filter(product => 
+                            selectedMaterials.value.includes(product.material)
+                        );
+                    }
+                    
+                    // Apply gemstone filter
+                    if (selectedGemstones.value.length > 0) {
+                        result = result.filter(product => 
+                            selectedGemstones.value.includes(product.gemstone)
+                        );
+                    }
+                    
+                    // Apply rating filter
+                    if (minRating.value > 0) {
+                        result = result.filter(product => product.rating >= minRating.value);
+                    }
+                    
+                    // Apply sorting
+                    switch (sortOption.value) {
+                        case 'price-low':
+                            result.sort((a, b) => a.price - b.price);
+                            break;
+                        case 'price-high':
+                            result.sort((a, b) => b.price - a.price);
+                            break;
+                        case 'rating':
+                            result.sort((a, b) => b.rating - a.rating);
+                            break;
+                        case 'newest':
+                            // Sort by id in this case (assuming higher id = newer)
+                            result.sort((a, b) => b.id - a.id);
+                            break;
+                        default: // featured
+                            // Keep the default order
+                            break;
+                    }
+                    
+                    return result;
+                });
+                
+                const totalPages = computed(() => {
+                    return Math.ceil(filteredProducts.value.length / itemsPerPage.value);
+                });
+                
+                const paginatedProducts = computed(() => {
+                    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+                    const endIndex = startIndex + itemsPerPage.value;
+                    return filteredProducts.value.slice(startIndex, endIndex);
+                });
+                
+                const visiblePageNumbers = computed(() => {
+                    const delta = 2;
+                    const range = [];
+                    const rangeWithDots = [];
+                    let l;
+                    
+                    for (let i = 1; i <= totalPages.value; i++) {
+                        if (i === 1 || i === totalPages.value || 
+                            (i >= currentPage.value - delta && i <= currentPage.value + delta)) {
+                            range.push(i);
+                        }
+                    }
+                    
+                    for (let i of range) {
+                        if (l) {
+                            if (i - l === 2) {
+                                rangeWithDots.push(l + 1);
+                            } else if (i - l !== 1) {
+                                rangeWithDots.push('...');
+                            }
+                        }
+                        rangeWithDots.push(i);
+                        l = i;
+                    }
+                    
+                    return rangeWithDots;
+                });
+                
+                // Methods
+                const capitalizeFirst = (str) => {
+                    if (!str) return '';
+                    return str.charAt(0).toUpperCase() + str.slice(1);
+                };
+        
+                const formatPrice = (price) => {
+                    return price.toFixed(2);
+                };
+        
+                const updatePriceSlider = () => {
+                    // Ensure minimum value doesn't exceed maximum value
+                    if (priceRange.value[0] > priceRange.value[1]) {
+                        priceRange.value[0] = priceRange.value[1];
+                    }
+                    
+                    // Update the jQuery UI slider with the new values
+                    if ($("#price-slider").length) {
+                        $("#price-slider").slider("values", 0, priceRange.value[0]);
+                        $("#price-slider").slider("values", 1, priceRange.value[1]);
+                    }
+                    
+                    // Apply the filters when input values change
+                    currentPage.value = 1;
+                };
+        
+                const initPriceSlider = () => {
+                    $("#price-slider").slider({
+                        range: true,
+                        min: 0,
+                        max: 9999,
+                        values: [priceRange.value[0], priceRange.value[1]],
+                        slide: function(event, ui) {
+                            // Update the Vue reactive property during sliding
+                            priceRange.value = [ui.values[0], ui.values[1]];
+                        },
+                        change: function(event, ui) {
+                            // Reset to page 1 and apply filters when slider changes
+                            currentPage.value = 1;
+                        }
+                    });
+                };
+                
+                const setCategory = (category) => {
+                    currentCategory.value = category;
+                    currentPage.value = 1;
+                };
+                
+                const clearCategoryFilter = () => {
+                    currentCategory.value = '';
+                    currentPage.value = 1;
+                    router.push({ query: { category: '' } });
+                };
+                
+                const resetPriceFilter = () => {
+                    priceRange.value = [0, 9999];
+                    // Update jQuery UI slider if using it
+                    if ($("#price-slider").length) {
+                        $("#price-slider").slider("values", 0, 0);
+                        $("#price-slider").slider("values", 1, 9999);
+                    }
+                    currentPage.value = 1;
+                };
+                
+                const removeMaterial = (material) => {
+                    selectedMaterials.value = selectedMaterials.value.filter(m => m !== material);
+                    currentPage.value = 1;
+                };
+                
+                const removeGemstone = (gemstone) => {
+                    selectedGemstones.value = selectedGemstones.value.filter(g => g !== gemstone);
+                    currentPage.value = 1;
+                };
+                
+                const clearAllFilters = () => {
+                    searchQuery.value = '';
+                    currentCategory.value = '';
+                    priceRange.value = [0, 9999];
+                    selectedMaterials.value = [];
+                    selectedGemstones.value = [];
+                    minRating.value = 0;
+                    currentPage.value = 1;
+                    
+                    // Update jQuery UI slider if using it
+                    if ($("#price-slider").length) {
+                        $("#price-slider").slider("values", 0, 0);
+                        $("#price-slider").slider("values", 1, 9999);
+                    }
+                    
+                    router.push({ query: { category: '' } });
+                };
+                
+                const applySearch = () => {
+                    currentPage.value = 1;
+                };
+                
+                const toggleWishlist = (product) => {
+                    product.inWishlist = !product.inWishlist;
+                };
+                
+                const addToCart = (product) => {
+                    // Get current cart from localStorage or initialize empty array
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    
+                    // Check if product already exists in cart
+                    const existingProductIndex = cart.findIndex(item => item.id === product.id);
+                    
+                    if (existingProductIndex >= 0) {
+                        // Increment quantity if product already in cart
+                        cart[existingProductIndex].quantity += 1;
+                    } else {
+                        // Add new product with quantity 1
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1,
+                            material: product.material || '',
+                            gemstone: product.gemstone || ''
+                        });
+                    }
+                    
+                    // Save updated cart to localStorage
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    
+                    // Update cart count
+                    cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+                    
+                    alert(`${product.name} added to your cart!`);
+                };
+                
+                const addToCartWithQuantity = (product) => {
+                    // Get current cart from localStorage or initialize empty array
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    
+                    // Check if product already exists in cart
+                    const existingProductIndex = cart.findIndex(item => item.id === product.id);
+                    
+                    if (existingProductIndex >= 0) {
+                        // Add quantity to existing product
+                        cart[existingProductIndex].quantity += quantity.value;
+                    } else {
+                        // Add new product with specified quantity
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: quantity.value,
+                            material: product.material || '',
+                            gemstone: product.gemstone || ''
+                        });
+                    }
+                    
+                    // Save updated cart to localStorage
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    
+                    // Update cart count
+                    cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+                    
+                    // Close modal and reset quantity
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('quickViewModal'));
+                    if (modal) modal.hide();
+                    
+                    quantity.value = 1;
+                    
+                    alert(`${product.name} added to your cart!`);
+                };
+                
+                const showQuickView = (product) => {
+                    selectedProduct.value = product;
+                    quantity.value = 1;
+                    
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+                    modal.show();
+                };
+                
+                const incrementQuantity = () => {
+                    quantity.value++;
+                };
+                
+                const decrementQuantity = () => {
+                    if (quantity.value > 1) {
+                        quantity.value--;
+                    }
+                };
+                
+                const logout = () => {
+                    isLoggedIn.value = false;
+                    localStorage.removeItem('isLoggedIn');
+                    alert('You have been logged out!');
+                    window.location.href = 'index.html';
+                };
+                
+                // Watch route changes for category updates
+                const handleRouteChange = () => {
+                    const category = router.currentRoute.value.query.category || '';
+                    if (category !== currentCategory.value) {
+                        currentCategory.value = category;
+                        currentPage.value = 1;
+                    }
+                };
+                
+                // Reset page when filtered products change
+                watch(filteredProducts, () => {
+                    if (currentPage.value > totalPages.value && totalPages.value > 0) {
+                        currentPage.value = 1;
+                    }
+                });
+                
+                // Watch loading state to ensure products display correctly
+                watch(loading, (newValue) => {
+                    if (newValue === false) {
+                        // Products finished loading, ensure view is refreshed
+                        nextTick(() => {
+                            if (paginatedProducts.value.length === 0 && filteredProducts.value.length > 0) {
+                                currentPage.value = 1;
+                            }
+                        });
+                    }
+                });
+                
+                // On component mounted
+                onMounted(() => {
+                    // Check if user is logged in from localStorage
+                    isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
+                    
+                    // Initialize cart count
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+                    
+                    // Initialize AOS animation library
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true
+                    });
+                    
+                    // Add scroll event listener for navbar
+                    window.addEventListener('scroll', () => {
+                        scrolled.value = window.scrollY > 50;
+                    });
+        
+                    // Initialize price slider
+                    initPriceSlider();
+        
+                    // Watch for price range changes to apply filters
+                    watch(priceRange, () => {
+                        currentPage.value = 1;
+                    }, { deep: true });
+                    
+                    // Back to top button functionality
+                    const backToTopButton = document.getElementById('backToTopBtn');
+                    
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 300) {
+                            backToTopButton.style.display = 'flex';
+                        } else {
+                            backToTopButton.style.display = 'none';
+                        }
+                    });
+                    
+                    backToTopButton.addEventListener('click', function() {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+        
+                    // Fetch products from JSON file and ensure they display
+                    fetchProducts().then(() => {
+                        // Force initial render of products after loading
+                        if (currentCategory.value === '') {
+                            console.log('Products loaded, displaying all jewelry');
+                        }
+                    });
+                    
+                    // Set up route change watcher
+                    router.afterEach(handleRouteChange);
+                    
+                    // Initialize category from URL
+                    handleRouteChange();
+        
+                    // Listen for storage events to update cart count
+                    window.addEventListener('storage', (event) => {
+                        if (event.key === 'cart') {
+                            const cart = JSON.parse(event.newValue || '[]');
+                            cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+                        }
+                    });
+                });
+                
+                // Return all values needed in the template
+                return {
+                    isLoggedIn,
+                    cartCount,
+                    scrolled,
+                    loading,
+                    searchQuery,
+                    currentCategory,
+                    priceRange,
+                    selectedMaterials,
+                    selectedGemstones,
+                    minRating,
+                    sortOption,
+                    viewMode,
+                    currentPage,
+                    itemsPerPage,
+                    quantity,
+                    selectedProduct,
+                    materials,
+                    gemstones,
+                    products,
+                    hasActiveFilters,
+                    filteredProducts,
+                    totalPages,
+                    paginatedProducts,
+                    visiblePageNumbers,
+                    
+                    capitalizeFirst,
+                    formatPrice,
+                    setCategory,
+                    clearCategoryFilter,
+                    resetPriceFilter,
+                    removeMaterial,
+                    removeGemstone,
+                    clearAllFilters,
+                    applySearch,
+                    toggleWishlist,
+                    addToCart,
+                    addToCartWithQuantity,
+                    showQuickView,
+                    incrementQuantity,
+                    decrementQuantity,
+                    updatePriceSlider,
+                    logout
+                };
+            }
+        });
+        
+        // Use the router
+        app.use(router);
+        
+        // Mount the app
+        app.mount('#app');
+    </script>
+</body>
+</html>

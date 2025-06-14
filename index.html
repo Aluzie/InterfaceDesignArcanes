@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanes | Home</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Css/Index.css">                  
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3" :class="{'scrolled': scrolled}">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <i class="bi bi-gem me-2"></i>Arcanes
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="About.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Contact.html">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="cart.html">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                                <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge">
+                                    {{ cartCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <!-- When logged in, show My Account and Logout -->
+                        <template v-if="isLoggedIn">
+                            <li class="nav-item">
+                                <a class="nav-link" href="account.html">
+                                    <i class="bi bi-person-circle me-1"></i>My Account
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="#" @click.prevent="logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </li>
+                        </template>
+                        <!-- When NOT logged in, show Login & Register -->
+                        <template v-else>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.html">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="register.html">Register</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero text-center">
+            <div class="container" data-aos="fade-up" data-aos-duration="1000">
+                <h1>Timeless Elegance</h1>
+                <p class="lead mb-4">Discover our curated collection of handcrafted jewelry and accessories that elevate your style with sophistication and charm.</p>
+                <a href="products.html" class="btn btn-primary btn-lg px-4 me-2">Shop Collection</a>
+                <a href="#featured" class="btn btn-outline-primary btn-lg px-4">Explore</a>
+            </div>
+        </section>
+
+        <!-- Featured Products Section -->
+        <section id="featured" class="py-5">
+            <div class="container">
+                <h2 class="text-center section-title" data-aos="fade-up">Featured Collection</h2>
+                <div class="row g-4">
+                    <div class="col-md-4" v-for="(product, index) in featuredProducts" :key="product.id" data-aos="fade-up" :data-aos-delay="index * 100">
+                        <div class="card h-100">
+                            <div class="card-img-container">
+                                <div class="card-badge" v-if="product.badge">{{ product.badge }}</div>
+                                <img :src="product.image" class="card-img-top" :alt="product.name">
+                                <div class="product-action">
+                                    <button class="btn btn-light btn-sm mx-1" title="Add to Wishlist">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                        <button class="btn btn-light btn-sm mx-1" title="Add to Cart" @click.prevent="addToCart(product)">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="product-rating mb-2">
+                                    <i class="bi bi-star-fill" v-for="n in product.rating"></i>
+                                    <i class="bi bi-star" v-for="n in 5 - product.rating"></i>
+                                </div>
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text text-muted">{{ product.description }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="price">MYR{{ product.price.toFixed(2) }}</span>
+                                    <button class="btn btn-sm btn-primary" @click="addToCart(product)">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-5" data-aos="fade-up">
+                    <a href="products.html" class="btn btn-outline-dark btn-lg px-4">View All Products</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wishlist Hearts -->
+        <script>
+            // Wait for the document to be fully loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                // Find all wishlist buttons
+                const wishlistButtons = document.querySelectorAll('button[title="Add to Wishlist"]');
+                
+                // Add click event listener to each button
+                wishlistButtons.forEach(button => {
+                    button.addEventListener('click', function(event) {
+                        // Prevent any parent elements from handling this click
+                        event.stopPropagation();
+                        
+                        // Find the heart icon inside this button
+                        const heartIcon = this.querySelector('.bi-heart, .bi-heart-fill');
+                        
+                        // Toggle between filled and outline heart icons
+                        if (heartIcon.classList.contains('bi-heart')) {
+                            // Switch to filled heart and make it red
+                            heartIcon.classList.remove('bi-heart');
+                            heartIcon.classList.add('bi-heart-fill', 'heart-active');
+                        } else {
+                            // Switch back to outline heart and remove red color
+                            heartIcon.classList.remove('bi-heart-fill', 'heart-active');
+                            heartIcon.classList.add('bi-heart');
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <!-- Features Section -->
+        <section class="py-5 bg-light">
+            <div class="container py-4">
+                <h2 class="text-center section-title" data-aos="fade-up">Why Choose Us</h2>
+                <div class="row g-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="bi bi-gem"></i>
+                            </div>
+                            <h4>Ethically Sourced</h4>
+                            <p class="text-muted">All our gemstones and materials are ethically sourced with full transparency in our supply chain.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="bi bi-award"></i>
+                            </div>
+                            <h4>Master Craftsmanship</h4>
+                            <p class="text-muted">Each piece is meticulously handcrafted by our experienced artisans with attention to detail.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="bi bi-box2-heart"></i>
+                            </div>
+                            <h4>Lifetime Warranty</h4>
+                            <p class="text-muted">We stand behind our quality with a lifetime warranty and complimentary cleaning services.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Arrivals Section -->
+        <section class="py-5">
+            <div class="container">
+                <h2 class="text-center section-title" data-aos="fade-up">New Arrivals</h2>
+                <div class="row g-4">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <div class="card">
+                            <div class="row g-0">
+                                <div class="col-md-6">
+                                    <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Bracelet collection">
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card-body d-flex flex-column justify-content-center h-100 p-4">
+                                        <h4 class="card-title">Bracelet Collection</h4>
+                                        <p class="card-text mb-4">Explore our new line of elegant bracelets featuring precious metals and exquisite gemstones.</p>
+                                        <a href="products.html" class="btn btn-primary align-self-start">Shop Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <div class="card">
+                            <div class="row g-0">
+                                <div class="col-md-6">
+                                    <div class="card-body d-flex flex-column justify-content-center h-100 p-4">
+                                        <h4 class="card-title">Statement Pieces</h4>
+                                        <p class="card-text mb-4">Discover our exclusive limited edition statement necklaces that define your unique style.</p>
+                                        <a href="products.html" class="btn btn-primary align-self-start">Shop Now</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <img src="https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Statement necklaces">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="py-5 bg-light">
+            <div class="container py-4">
+                <h2 class="text-center section-title" data-aos="fade-up">What Our Customers Say</h2>
+                <div class="row g-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="testimonial-card">
+                            <div class="product-rating mb-3">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="card-text mb-4">"The quality of the products exceeded my expectations. The attention to detail and craftsmanship is unparalleled. Will definitely shop here again!"</p>
+                            <div class="d-flex align-items-center mt-auto">
+                                <img src="https://randomuser.me/api/portraits/women/65.jpg" class="avatar" alt="Jane Doe">
+                                <div>
+                                    <h6 class="mb-0">Jane Doe</h6>
+                                    <small class="text-muted">Verified Customer</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="testimonial-card">
+                            <div class="product-rating mb-3">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                            </div>
+                            <p class="card-text mb-4">"Fast shipping and excellent customer service. The product was exactly as described and arrived beautifully packaged. I'm very impressed with the entire experience."</p>
+                            <div class="d-flex align-items-center mt-auto">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="avatar" alt="John Smith">
+                                <div>
+                                    <h6 class="mb-0">John Smith</h6>
+                                    <small class="text-muted">Verified Customer</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="testimonial-card">
+                            <div class="product-rating mb-3">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star"></i>
+                            </div>
+                            <p class="card-text mb-4">"Great selection of products and amazing deals. The website is easy to navigate and the checkout process was seamless. I've already recommended Elegance to all my friends!"</p>
+                            <div class="d-flex align-items-center mt-auto">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="avatar" alt="Alex Johnson">
+                                <div>
+                                    <h6 class="mb-0">Alex Johnson</h6>
+                                    <small class="text-muted">Verified Customer</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="py-5">
+            <div class="container py-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10" data-aos="fade-up">
+                        <div class="newsletter-form">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <h2 class="mb-3">Subscribe to Our Newsletter</h2>
+                                    <p class="mb-4">Join our community to receive the latest updates, exclusive offers, and style inspiration directly to your inbox.</p>
+                                </div>
+                                <div class="col-lg-6 d-flex align-items-center">
+                                    <div class="input-group">
+                                        <input type="email" class="form-control newsletter-input" placeholder="Enter your email address" v-model="email">
+                                        <button class="btn newsletter-button" type="button" @click="subscribe">Subscribe</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Arcanes</h5>
+                        <p class="mb-4">Crafting timeless jewelry and accessories that celebrate life's special moments and everyday elegance with exceptional quality and design.</p>
+                        <div class="d-flex mb-4">
+                            <a href="https://www.facebook.com/" class="social-icon" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/" class="social-icon" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="https://x.com/home" class="social-icon" target="_blank"><i class="bi bi-twitter"></i></a>
+                            <a href="https://www.pinterest.com/" class="social-icon" target="_blank"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Shop</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="products.html" class="footer-link">All Jewelry</a></li>
+                            <li><a href="products.html#/?category=necklaces" class="footer-link">Necklaces</a></li>
+                            <li><a href="products.html#/?category=rings" class="footer-link">Rings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Earrings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Bracelets</a></li>
+                            <li><a href="products.html#/?category=watches" class="footer-link">Watches</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Company</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="about.html" class="footer-link" target="_blank">About Us</a></li>
+                            <li><a href="Contact.html" class="footer-link" target="_blank">Contact</a></li>
+                            <li><a href="about.html" class="footer-link" target="_blank">FAQ</a></li>
+                            <li><a href="https://www.google.com/maps" class="footer-link" target="_blank">Store Locations</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Contact Us</h5>
+                        <div class="contact-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>75 Jalan Pending, Kuching, Sarawak, Malaysia</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>+60 12-421 2206</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-envelope"></i>
+                            <span>104386924@students.swinburne.edu.my</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-md-0">© 2025 Arcanes. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Privacy Policy</a>
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Terms of Service</a>
+                            <a href="About.html" class="footer-link d-inline-block" target="_blank">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Main JS -->
+    <script>
+        const { createApp, ref, reactive, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                // State variables
+                const isLoggedIn = ref(false);
+                const cartCount = ref(0);
+                const email = ref('');
+                const scrolled = ref(false);
+                
+                // Featured products data
+                const featuredProducts = ref([
+                    {
+                        id: 1,
+                        name: 'Diamond Pendant Necklace',
+                        description: 'Elegant sterling silver necklace with a sparkling diamond pendant, perfect for any occasion.',
+                        price: 199.99,
+                        image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                        rating: 5,
+                        badge: 'Best Seller'
+                    },
+                    {
+                        id: 2,
+                        name: 'Vintage Gold Ring',
+                        description: 'Handcrafted 18K gold ring with intricate detailing inspired by vintage designs.',
+                        price: 249.99,
+                        image: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                        rating: 4,
+                        badge: 'New'
+                    },
+                    {
+                        id: 3,
+                        name: 'Pearl Drop Earrings',
+                        description: 'Stunning freshwater pearl earrings with delicate silver details for elegant occasions.',
+                        price: 129.99,
+                        image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                        rating: 4,
+                        badge: '20% Off'
+                    }
+                ]);
+                
+                // Function to fetch product data from JSON file
+                const fetchProductData = async () => {
+                    try {
+                        const response = await fetch('products.json');
+                        const data = await response.json();
+                        featuredProducts.value = data.featuredProducts;
+                    } catch (error) {
+                        console.error('Error fetching product data:', error);
+                        // Keep using the hardcoded data as fallback
+                    }
+                };
+                
+                // Replace the current addToCart function with this improved version
+                const addToCart = (product) => {
+                    // Get existing cart from localStorage
+                    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    
+                    // Check if product already exists in cart
+                    const existingItem = cart.find(item => item.id === product.id);
+                    
+                    if (existingItem) {
+                        // Increment quantity if product already in cart
+                        existingItem.quantity++;
+                    } else {
+                        // Add new product to cart with quantity 1
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1
+                        });
+                    }
+                    
+                    // Update localStorage and cart count
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                    
+                    // Show success message
+                    alert(`${product.name} added to cart!`);
+                };
+
+                // Add this function to update cart count
+                const updateCartCount = () => {
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+                };
+                
+                // Authentication functions
+                const logout = () => {
+                    isLoggedIn.value = false;
+                    localStorage.removeItem('isLoggedIn');
+                    alert('You have been logged out!');
+                    window.location.href = 'index.html';
+                };
+                
+                // Newsletter subscription
+                const subscribe = () => {
+                    if (email.value && /^\S+@\S+\.\S+$/.test(email.value)) {
+                        alert(`Thank you for subscribing with: ${email.value}`);
+                        email.value = '';
+                    } else {
+                        alert('Please enter a valid email address');
+                    }
+                };
+                
+                // Wishlist functionality
+                const toggleWishlist = (product) => {
+                    alert(`${product.name} ${product.inWishlist ? 'removed from' : 'added to'} wishlist!`);
+                    product.inWishlist = !product.inWishlist;
+                };
+                
+                // Scroll to top function
+                const scrollToTop = () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+                
+                onMounted(() => {
+                    // Check if user is logged in from localStorage
+                    isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
+                    
+                    // Initialize AOS animation library
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true
+                    });
+                    
+                    // Try to fetch product data
+                    fetchProductData();
+
+                     // Initialize cart count from localStorage
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+
+                    // Initialize cart count from localStorage
+                    updateCartCount();
+                    
+                    // Add scroll event listener for navbar and back-to-top button
+                    window.addEventListener('scroll', () => {
+                        scrolled.value = window.scrollY > 50;
+                    });
+                    
+                    // Initialize animation for elements with fade-up class
+                    const fadeElements = document.querySelectorAll('.fade-up');
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('active');
+                            }
+                        });
+                    }, { threshold: 0.1 });
+                    
+                    fadeElements.forEach(element => {
+                        observer.observe(element);
+                    });
+                    
+                    // Back to top button functionality
+                    const backToTopButton = document.getElementById('backToTopBtn');
+                    
+                    if (backToTopButton) {
+                        window.addEventListener('scroll', function() {
+                            if (window.scrollY > 300) {
+                                backToTopButton.style.display = 'flex';
+                            } else {
+                                backToTopButton.style.display = 'none';
+                            }
+                        });
+                        
+                        backToTopButton.addEventListener('click', function() {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        });
+                    }
+                });
+                
+                return {
+                    isLoggedIn,
+                    cartCount,
+                    email,
+                    scrolled,
+                    featuredProducts,
+                    addToCart,
+                    toggleWishlist,
+                    logout,
+                    subscribe,
+                    scrollToTop
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanes | Register</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Css/Register.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation with standalone Logout button -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3" :class="{'scrolled': scrolled}">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <i class="bi bi-gem me-2"></i>Elegance
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="About.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Contact.html">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="cart.html">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                                <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge">
+                                    {{ cartCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <!-- When logged in, show My Account and Logout -->
+                        <template v-if="isLoggedIn">
+                            <li class="nav-item">
+                                <a class="nav-link" href="account.html">
+                                    <i class="bi bi-person-circle me-1"></i>My Account
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="#" @click.prevent="logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </li>
+                        </template>
+                        <!-- When NOT logged in, show Login & Register -->
+                        <template v-else>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.html">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="register.html">Register</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page Header -->
+        <section class="page-header text-center">
+            <div class="container" data-aos="fade-up" data-aos-duration="1000">
+                <h1>Create an Account</h1>
+                <p class="lead">Join Arcanes to enjoy exclusive benefits and a personalized shopping experience</p>
+            </div>
+        </section>
+
+        <!-- Registration Form Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8" data-aos="fade-up">
+                        <div class="form-card">
+                            <h3 class="mb-4 text-center">Sign Up</h3>
+                            
+                            <!-- Registration Form -->
+                            <form @submit.prevent="registerUser" class="needs-validation" novalidate>
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" v-model="form.firstName" required :class="{'is-invalid': validation.firstName}">
+                                        <div class="invalid-feedback" v-if="validation.firstName">
+                                            {{ validation.firstName }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" v-model="form.lastName" required :class="{'is-invalid': validation.lastName}">
+                                        <div class="invalid-feedback" v-if="validation.lastName">
+                                            {{ validation.lastName }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" v-model="form.email" required :class="{'is-invalid': validation.email}">
+                                    <div class="invalid-feedback" v-if="validation.email">
+                                        {{ validation.email }}
+                                    </div>
+                                </div>
+                                
+                                <!-- Password Field with Fixed Positioning -->
+                                <div class="mb-4">
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="password-wrapper">
+                                        <input :type="showPassword ? 'text' : 'password'" 
+                                               class="form-control" 
+                                               id="password" 
+                                               v-model="form.password" 
+                                               required 
+                                               :class="{'is-invalid': validation.password}"
+                                               @input="checkPasswordStrength">
+                                        <button type="button" 
+                                                class="password-toggle-btn" 
+                                                @click="showPassword = !showPassword">
+                                            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                        </button>
+                                    </div>
+                                    <!-- Everything below is outside the password-wrapper -->
+                                    <div class="invalid-feedback" v-if="validation.password">
+                                        {{ validation.password }}
+                                    </div>
+                                    <div class="password-strength-meter" v-if="form.password">
+                                        <div :class="passwordStrengthClass"></div>
+                                    </div>
+                                    <div class="password-strength-text" v-if="form.password">
+                                        {{ passwordStrengthText }}
+                                    </div>
+                                </div>
+                                
+                                <!-- Also replace the confirm password field HTML -->
+                                <div class="mb-4">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <div class="password-wrapper">
+                                        <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control" id="confirmPassword" 
+                                               v-model="form.confirmPassword" required 
+                                               :class="{'is-invalid': validation.confirmPassword}">
+                                        <button type="button" class="btn password-toggle-btn" @click="showConfirmPassword = !showConfirmPassword">
+                                            <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                        </button>
+                                        <div class="invalid-feedback" v-if="validation.confirmPassword">
+                                            {{ validation.confirmPassword }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-end-0">
+                                            <img src="https://flagcdn.com/w20/my.png" width="20" alt="Malaysian flag" class="me-1">
+                                            +60
+                                        </span>
+                                        <input type="tel" class="form-control border-start-0" id="phone" placeholder="1234 5678" 
+                                               v-model="form.phone" :class="{'is-invalid': validation.phone}">
+                                        <div class="invalid-feedback" v-if="validation.phone">
+                                            {{ validation.phone }}
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">Format: +60 1234 5678</small>
+                                </div>
+
+                                <script>
+                                    // Phone validation (Malaysian format)
+                                    if (form.phone) {
+                                        // Remove any spaces, dashes or parentheses
+                                        const cleanPhone = form.phone.replace(/[\s\-()]/g, '');
+                                        // Malaysian mobile numbers typically start with 1 and are 9-10 digits
+                                        const validMalaysianNumber = /^[1-9]\d{8,9}$/.test(cleanPhone);
+                                        
+                                        if (!validMalaysianNumber) {
+                                            validation.phone = 'Please enter a valid Malaysian phone number';
+                                            isValid = false;
+                                        }
+                                    }
+                                </script>
+                                
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="termsCheck" v-model="form.termsAccepted" required :class="{'is-invalid': validation.termsAccepted}">
+                                        <label class="form-check-label" for="termsCheck">
+                                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                        </label>
+                                        <div class="invalid-feedback" v-if="validation.termsAccepted">
+                                            {{ validation.termsAccepted }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="newsletterCheck" v-model="form.newsletter">
+                                        <label class="form-check-label" for="newsletterCheck">
+                                            Subscribe to our newsletter for updates and exclusive offers
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg" :disabled="isSubmitting">
+                                        <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div class="divider">
+                                <span>or sign up with</span>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <button class="social-btn google-btn" @click="socialLogin('google')">
+                                        <i class="bi bi-google"></i> Google
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="social-btn facebook-btn" @click="socialLogin('facebook')">
+                                        <i class="bi bi-facebook"></i> Facebook
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <p class="mb-0">Already have an account? <a href="login.html" class="text-decoration-none">Sign In</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Arcanes</h5>
+                        <p class="mb-4">Crafting timeless jewelry and accessories that celebrate life's special moments and everyday elegance with exceptional quality and design.</p>
+                        <div class="d-flex mb-4">
+                            <a href="https://www.facebook.com/" class="social-icon" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/" class="social-icon" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="https://x.com/home" class="social-icon" target="_blank"><i class="bi bi-twitter"></i></a>
+                            <a href="https://www.pinterest.com/" class="social-icon" target="_blank"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Shop</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="products.html" class="footer-link">All Jewelry</a></li>
+                            <li><a href="products.html#/?category=necklaces" class="footer-link">Necklaces</a></li>
+                            <li><a href="products.html#/?category=rings" class="footer-link">Rings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Earrings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Bracelets</a></li>
+                            <li><a href="products.html#/?category=watches" class="footer-link">Watches</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Company</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="about.html" class="footer-link" target="_blank">About Us</a></li>
+                            <li><a href="Contact.html" class="footer-link" target="_blank">Contact</a></li>
+                            <li><a href="about.html" class="footer-link" target="_blank">FAQ</a></li>
+                            <li><a href="https://www.google.com/maps" class="footer-link" target="_blank">Store Locations</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Contact Us</h5>
+                        <div class="contact-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>75 Jalan Pending, Kuching, Sarawak, Malaysia</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>+60 12-421 2206</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-envelope"></i>
+                            <span>104386924@students.swinburne.edu.my</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-md-0">© 2025 Arcanes. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Privacy Policy</a>
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Terms of Service</a>
+                            <a href="About.html" class="footer-link d-inline-block" target="_blank">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Main JS -->
+    <script>
+        const { createApp, ref, reactive, computed, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                const isLoggedIn = ref(false);
+                const cartCount = ref(0);
+                const scrolled = ref(false);
+                const isSubmitting = ref(false);
+                const showPassword = ref(false);
+                const showConfirmPassword = ref(false);
+                const passwordStrength = ref(0);
+                
+                // Form data
+                const form = reactive({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    phone: '',
+                    termsAccepted: false,
+                    newsletter: true
+                });
+                
+                // Form validation
+                const validation = reactive({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    phone: '',
+                    termsAccepted: ''
+                });
+                
+                // Password strength indicator
+                const passwordStrengthClass = computed(() => {
+                    if (passwordStrength.value < 30) return 'strength-weak';
+                    if (passwordStrength.value < 60) return 'strength-medium';
+                    if (passwordStrength.value < 80) return 'strength-good';
+                    return 'strength-strong';
+                });
+                
+                const passwordStrengthText = computed(() => {
+                    if (passwordStrength.value < 30) return 'Weak';
+                    if (passwordStrength.value < 60) return 'Medium';
+                    if (passwordStrength.value < 80) return 'Good';
+                    return 'Strong';
+                });
+                
+                // Check password strength
+                const checkPasswordStrength = () => {
+                    const password = form.password;
+                    
+                    if (!password) {
+                        passwordStrength.value = 0;
+                        return;
+                    }
+                    
+                    let strength = 0;
+                    
+                    // Length check
+                    if (password.length >= 8) strength += 25;
+                    
+                    // Contains uppercase
+                    if (/[A-Z]/.test(password)) strength += 25;
+                    
+                    // Contains lowercase
+                    if (/[a-z]/.test(password)) strength += 15;
+                    
+                    // Contains numbers
+                    if (/\d/.test(password)) strength += 15;
+                    
+                    // Contains special characters
+                    if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+                    
+                    passwordStrength.value = strength;
+                };
+                
+                // Clear all validation errors
+                const clearValidation = () => {
+                    Object.keys(validation).forEach(key => {
+                        validation[key] = '';
+                    });
+                };
+                
+                // Validate form
+                const validateForm = () => {
+                    clearValidation();
+                    let isValid = true;
+                    
+                    // First name validation
+                    if (!form.firstName.trim()) {
+                        validation.firstName = 'First name is required';
+                        isValid = false;
+                    }
+                    
+                    // Last name validation
+                    if (!form.lastName.trim()) {
+                        validation.lastName = 'Last name is required';
+                        isValid = false;
+                    }
+                    
+                    // Email validation
+                    if (!form.email.trim()) {
+                        validation.email = 'Email is required';
+                        isValid = false;
+                    } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+                        validation.email = 'Please enter a valid email address';
+                        isValid = false;
+                    }
+                    
+                    // Password validation
+                    if (!form.password) {
+                        validation.password = 'Password is required';
+                        isValid = false;
+                    } else if (form.password.length < 8) {
+                        validation.password = 'Password must be at least 8 characters long';
+                        isValid = false;
+                    }
+                    
+                    // Confirm password validation
+                    if (!form.confirmPassword) {
+                        validation.confirmPassword = 'Please confirm your password';
+                        isValid = false;
+                    } else if (form.password !== form.confirmPassword) {
+                        validation.confirmPassword = 'Passwords do not match';
+                        isValid = false;
+                    }
+                    
+                    // Phone validation (optional)
+                    if (form.phone && !/^\+?[\d\s-()]+$/.test(form.phone)) {
+                        validation.phone = 'Please enter a valid phone number';
+                        isValid = false;
+                    }
+                    
+                    // Terms acceptance
+                    if (!form.termsAccepted) {
+                        validation.termsAccepted = 'You must accept the terms and conditions';
+                        isValid = false;
+                    }
+                    
+                    return isValid;
+                };
+                
+                // Register user
+                const registerUser = async () => {
+                    if (!validateForm()) {
+                        return;
+                    }
+                    
+                    isSubmitting.value = true;
+                    
+                    try {
+                        // Simulate API request
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        
+                        // Store user data in localStorage
+                        const userData = {
+                            firstName: form.firstName,
+                            lastName: form.lastName,
+                            email: form.email,
+                            // For demonstration only - in a real app, passwords should NEVER be stored in plain text
+                            // This would normally be handled securely on a backend server
+                            password: btoa(form.password), // Simple base64 encoding (NOT secure encryption)
+                            phone: form.phone,
+                            newsletter: form.newsletter,
+                            registrationDate: new Date().toISOString()
+                        };
+                        
+                        // Save the user data to localStorage
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        
+                        // Also store in a users collection to allow multiple registrations
+                        let users = JSON.parse(localStorage.getItem('users') || '[]');
+                        users.push(userData);
+                        localStorage.setItem('users', JSON.stringify(users));
+                        
+                        // Set logged in flag
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+                        
+                        console.log('User data saved to localStorage:', userData);
+                        
+                        // Success - redirect to login or account page
+                        alert('Registration successful! Welcome to Arcanes.');
+                        window.location.href = 'account.html'; // Direct to account page instead of login
+                    } catch (error) {
+                        console.error('Registration error:', error);
+                        alert('An error occurred during registration. Please try again.');
+                    } finally {
+                        isSubmitting.value = false;
+                    }
+                };
+                
+                // Social login handler
+                const socialLogin = (provider) => {
+                    alert(`${provider} login integration will be implemented here.`);
+                };
+                
+                // Logout function
+                const logout = () => {
+                    isLoggedIn.value = false;
+                    alert('You have been logged out!');
+                };
+                
+                onMounted(() => {
+                    // Initialize AOS animation library
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true
+                    });
+                    
+                    // Add scroll event listener for navbar
+                    window.addEventListener('scroll', () => {
+                        scrolled.value = window.scrollY > 50;
+                    });
+                    
+                    // Back to top button functionality
+                    const backToTopButton = document.getElementById('backToTopBtn');
+                    
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 300) {
+                            backToTopButton.style.display = 'flex';
+                        } else {
+                            backToTopButton.style.display = 'none';
+                        }
+                    });
+                    
+                    backToTopButton.addEventListener('click', function() {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                });
+                
+                return {
+                    isLoggedIn,
+                    cartCount,
+                    scrolled,
+                    form,
+                    validation,
+                    isSubmitting,
+                    showPassword,
+                    showConfirmPassword,
+                    passwordStrengthClass,
+                    passwordStrengthText,
+                    registerUser,
+                    socialLogin,
+                    logout,
+                    checkPasswordStrength
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

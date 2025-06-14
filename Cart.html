@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanes | Shopping Cart</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- jQuery UI CSS -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/Index.css">
+    <link rel="stylesheet" href="css/Products.css">
+    <link rel="stylesheet" href="css/Cart.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3" :class="{'scrolled': scrolled}">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <i class="bi bi-gem me-2"></i>Arcanes
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="About.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Contact.html">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="cart.html">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                                <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge">
+                                    {{ cartCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <!-- When logged in, show My Account and Logout -->
+                        <template v-if="isLoggedIn">
+                            <li class="nav-item">
+                                <a class="nav-link" href="account.html">
+                                    <i class="bi bi-person-circle me-1"></i>My Account
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="#" @click.prevent="logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </li>
+                        </template>
+                        <!-- When NOT logged in, show Login & Register -->
+                        <template v-else>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.html">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="register.html">Register</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Cart Header -->
+        <div class="products-header text-center">
+            <div class="container">
+                <h1 data-aos="fade-up">Shopping Cart</h1>
+                <p data-aos="fade-up" data-aos-delay="100">Review your items and proceed to checkout</p>
+            </div>
+        </div>
+
+        <!-- Cart Content -->
+        <section class="py-5">
+            <div class="container" data-aos="fade-up">
+                <!-- Empty Cart Message -->
+                <div v-if="cartItems.length === 0" class="text-center py-5">
+                    <i class="bi bi-cart3 display-1 text-muted mb-4"></i>
+                    <h3>Your cart is empty</h3>
+                    <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+                    <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+                </div>
+
+                <!-- Cart Items -->
+                <div v-if="cartItems.length > 0" class="row">
+                    <div class="col-lg-8">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-4">Cart Items ({{ cartTotalItems }})</h5>
+                                
+                                <!-- Cart Item -->
+                                <div v-for="(item, index) in cartItems" :key="item.id" class="row mb-4 align-items-center border-bottom pb-4">
+                                    <div class="col-md-2 mb-3 mb-md-0">
+                                        <img :src="item.image" alt="Product Image" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-md-4 mb-3 mb-md-0">
+                                        <h6 class="mb-1">{{ item.name }}</h6>
+                                        <p class="small text-muted mb-0" v-if="item.material">Material: {{ capitalizeFirst(item.material) }}</p>
+                                        <p class="small text-muted mb-0" v-if="item.gemstone">Gemstone: {{ capitalizeFirst(item.gemstone) }}</p>
+                                    </div>
+                                    <div class="col-md-2 mb-3 mb-md-0">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-secondary" type="button" @click="decrementQuantity(index)">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="text" class="form-control text-center" v-model="item.quantity" readonly>
+                                            <button class="btn btn-outline-secondary" type="button" @click="incrementQuantity(index)">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3 mb-md-0 text-md-end">
+                                        <span class="fw-bold">MYR {{ formatPrice(item.price) }}</span>
+                                    </div>
+                                    <div class="col-md-2 text-md-end">
+                                        <button class="btn btn-sm btn-outline-danger" @click="removeItem(index)">
+                                            <i class="bi bi-trash"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                    <a href="products.html" class="btn btn-outline-primary">
+                                        <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                                    </a>
+                                    <button class="btn btn-outline-danger" @click="clearCart">
+                                        <i class="bi bi-trash me-2"></i>Clear Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Summary -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="mb-4">Order Summary</h5>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Subtotal:</span>
+                                    <span>MYR {{ formatPrice(cartSubtotal) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Shipping:</span>
+                                    <span v-if="cartSubtotal >= 500">Free</span>
+                                    <span v-else>MYR {{ formatPrice(shippingFee) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Tax (6%):</span>
+                                    <span>MYR {{ formatPrice(tax) }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between mb-4">
+                                    <span class="fw-bold">Total:</span>
+                                    <span class="fw-bold text-accent-color fs-5">MYR {{ formatPrice(cartTotal) }}</span>
+                                </div>
+                                <p class="small text-muted mb-3" v-if="cartSubtotal < 500">
+                                    Add MYR {{ formatPrice(500 - cartSubtotal) }} more to get FREE shipping
+                                </p>
+                                <button class="btn btn-primary w-100 py-3" @click="checkout">
+                                    Proceed to Checkout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Checkout Modal -->
+        <div class="modal fade" id="checkoutModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="checkoutModalLabel">
+                            <span v-if="checkoutStep === 1">Select Shipping Address</span>
+                            <span v-if="checkoutStep === 2">Select Payment Method</span>
+                            <span v-if="checkoutStep === 3">Review Order</span>
+                            <span v-if="checkoutStep === 4">Order Confirmation</span>
+                        </h5>
+                        <button type="button" class="btn-close" @click="closeCheckoutModal" :disabled="processingOrder"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Progress bar -->
+                        <div class="progress mb-4" v-if="checkoutStep < 4">
+                            <div class="progress-bar" role="progressbar" :style="{width: (checkoutStep / 3 * 100) + '%'}" 
+                                 :aria-valuenow="checkoutStep" aria-valuemin="0" aria-valuemax="3"></div>
+                        </div>
+                        
+                        <!-- Step 1: Shipping Information -->
+                        <div v-if="checkoutStep === 1">
+                            <!-- No saved addresses case -->
+                            <div v-if="!userData.addresses || userData.addresses.length === 0" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="bi bi-geo-alt display-4 text-muted"></i>
+                                    <p class="mt-3 mb-0">You haven't added any shipping addresses yet.</p>
+                                    <a href="account.html#addresses-tab" class="btn btn-primary mt-3">Add Address in Account</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Has saved addresses case -->
+                            <div v-else>
+                                <p class="mb-3">Please select a shipping address or <a href="account.html#addresses-tab">manage your addresses</a>.</p>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6" v-for="(address, index) in userData.addresses" :key="index">
+                                        <div class="card h-100" :class="{'border-primary': selectedAddress === index}" 
+                                             @click="selectedAddress = index">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title mb-0">
+                                                        {{ address.name }}
+                                                        <span class="badge bg-primary ms-1" v-if="address.default">Default</span>
+                                                    </h6>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" :name="'address-' + index" 
+                                                               :id="'address-' + index" :value="index" v-model="selectedAddress">
+                                                    </div>
+                                                </div>
+                                                <p class="card-text mb-1">{{ address.street }}</p>
+                                                <p class="card-text mb-1">{{ address.city }}, {{ address.state }} {{ address.zip }}</p>
+                                                <p class="card-text mb-1">{{ address.country }}</p>
+                                                <p class="card-text mb-0"><i class="bi bi-telephone me-1"></i> {{ address.phone }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Payment Method -->
+                        <div v-if="checkoutStep === 2">
+                            <!-- No saved payment methods case -->
+                            <div v-if="!userData.paymentMethods || userData.paymentMethods.length === 0" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="bi bi-credit-card display-4 text-muted"></i>
+                                    <p class="mt-3 mb-0">You haven't added any payment methods yet.</p>
+                                    <a href="account.html#payment-methods-tab" class="btn btn-primary mt-3">Add Payment Method in Account</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Has saved payment methods case -->
+                            <div v-else>
+                                <p class="mb-3">Please select a payment method or <a href="account.html#payment-methods-tab">manage your payment methods</a>.</p>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6" v-for="(payment, index) in userData.paymentMethods" :key="index">
+                                        <div class="card h-100" :class="{'border-primary': selectedPayment === index}" 
+                                             @click="selectedPayment = index">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title mb-0 d-flex align-items-center">
+                                                        <i :class="getCardIcon(payment.type)" class="me-2"></i>
+                                                        {{ payment.type }} •••• {{ payment.lastFour }}
+                                                        <span class="badge bg-primary ms-2" v-if="payment.default">Default</span>
+                                                    </h6>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" :name="'payment-' + index" 
+                                                               :id="'payment-' + index" :value="index" v-model="selectedPayment">
+                                                    </div>
+                                                </div>
+                                                <p class="card-text mb-1">{{ payment.name }}</p>
+                                                <p class="card-text mb-0">Expires: {{ payment.expMonth }}/{{ payment.expYear }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Review Order -->
+                        <div v-if="checkoutStep === 3">
+                            <h6 class="mb-3">Shipping Address</h6>
+                            <div v-if="userData.addresses && userData.addresses.length > 0 && selectedAddress !== null">
+                                <p class="mb-3">
+                                    {{ userData.addresses[selectedAddress].name }}<br>
+                                    {{ userData.addresses[selectedAddress].street }}<br>
+                                    {{ userData.addresses[selectedAddress].city }}, {{ userData.addresses[selectedAddress].state }} {{ userData.addresses[selectedAddress].zip }}<br>
+                                    {{ userData.addresses[selectedAddress].country }}<br>
+                                    {{ userData.addresses[selectedAddress].phone }}
+                                </p>
+                            </div>
+                            
+                            <hr>
+                            
+                            <h6 class="mb-3">Payment Method</h6>
+                            <div v-if="userData.paymentMethods && userData.paymentMethods.length > 0 && selectedPayment !== null">
+                                <p class="mb-3 d-flex align-items-center">
+                                    <i :class="getCardIcon(userData.paymentMethods[selectedPayment].type)" class="me-2"></i>
+                                    {{ userData.paymentMethods[selectedPayment].type }} ending in {{ userData.paymentMethods[selectedPayment].lastFour }}<br>
+                                    Expires: {{ userData.paymentMethods[selectedPayment].expMonth }}/{{ userData.paymentMethods[selectedPayment].expYear }}
+                                </p>
+                            </div>
+                            
+                            <hr>
+                            
+                            <h6 class="mb-3">Order Summary</h6>
+                            <div class="cart-items-review">
+                                <div v-for="(item, index) in cartItems" :key="index" class="d-flex justify-content-between mb-2">
+                                    <div>
+                                        <span>{{ item.name }}</span>
+                                        <span class="text-muted"> × {{ item.quantity }}</span>
+                                    </div>
+                                    <span>MYR {{ formatPrice(item.price * item.quantity) }}</span>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>MYR {{ formatPrice(cartSubtotal) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span v-if="cartSubtotal >= 500">Free</span>
+                                <span v-else>MYR {{ formatPrice(shippingFee) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax (6%):</span>
+                                <span>MYR {{ formatPrice(tax) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span class="fw-bold">Total:</span>
+                                <span class="fw-bold text-accent-color">MYR {{ formatPrice(cartTotal) }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4: Order Confirmation -->
+                        <div v-if="checkoutStep === 4">
+                            <div class="text-center mb-4">
+                                <i class="bi bi-check-circle-fill text-success display-1"></i>
+                                <h4 class="mt-3">Thank You For Your Order!</h4>
+                                <p class="lead">Your order has been placed successfully.</p>
+                                <p>Order #: <strong>{{ orderNumber }}</strong></p>
+                                <p>A confirmation email has been sent to <strong>{{ userData.email }}</strong></p>
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h6>Order Details</h6>
+                                    <p class="mb-1"><strong>Order Date:</strong> {{ new Date().toLocaleDateString() }}</p>
+                                    <p class="mb-1"><strong>Payment Method:</strong> {{ userData.paymentMethods && selectedPayment !== null ? userData.paymentMethods[selectedPayment].type : 'Credit Card' }}</p>
+                                    <p v-if="userData.addresses && selectedAddress !== null">
+                                        <strong>Shipping Address:</strong> 
+                                        {{ userData.addresses[selectedAddress].street }}, 
+                                        {{ userData.addresses[selectedAddress].city }}, 
+                                        {{ userData.addresses[selectedAddress].state }} 
+                                        {{ userData.addresses[selectedAddress].zip }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p>We'll send you shipping confirmation when your items are on the way!</p>
+                                <p class="mb-0">Any questions about your order? <a href="Contact.html">Contact our support team</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" v-if="checkoutStep < 4">
+                        <button type="button" class="btn btn-outline-secondary" 
+                                @click="prevStep" v-if="checkoutStep > 1" :disabled="processingOrder">
+                            Back
+                        </button>
+                        <button type="button" class="btn btn-primary" @click="nextStep" 
+                                :disabled="processingOrder || 
+                                         (checkoutStep === 1 && (!userData.addresses || userData.addresses.length === 0 || selectedAddress === null)) || 
+                                         (checkoutStep === 2 && (!userData.paymentMethods || userData.paymentMethods.length === 0 || selectedPayment === null))">
+                            <span v-if="checkoutStep < 3">Continue</span>
+                            <span v-if="checkoutStep === 3 && !processingOrder">Place Order</span>
+                            <span v-if="checkoutStep === 3 && processingOrder">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                    <div class="modal-footer" v-else>
+                        <button type="button" class="btn btn-primary" @click="closeCheckoutModal">
+                            Continue Shopping
+                        </button>
+                        <a href="products.html" class="btn btn-outline-primary">
+                            Shop More
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar Products Section -->
+        <section class="py-5 bg-light" v-if="cartItems.length > 0" data-aos="fade-up">
+            <div class="container">
+                <h2 class="text-center section-title mb-5">You May Also Like</h2>
+                <div class="row g-4">
+                    <div v-for="product in recommendedProducts" :key="product.id" class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-img-container">
+                                <img :src="product.image" class="card-img-top" :alt="product.name">
+                                <span v-if="product.badge" class="card-badge" :class="{'sale': product.badge === 'Sale', 'new': product.badge === 'New'}">{{ product.badge }}</span>
+                                <div class="product-action">
+                                    <button class="btn btn-light btn-sm rounded-circle" @click="addToCart(product)">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                    <button class="btn btn-light btn-sm rounded-circle ms-2" @click="toggleWishlist(product)">
+                                        <i class="bi" :class="[product.inWishlist ? 'bi-heart-fill heart-active' : 'bi-heart']"></i>
+                                    </button>
+                                    <button class="btn btn-light btn-sm rounded-circle ms-2" @click="showQuickView(product)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <span class="product-category">{{ capitalizeFirst(product.category) }}</span>
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <div class="product-rating">
+                                    <i v-for="i in 5" :key="i" class="bi" :class="i <= Math.floor(product.rating) ? 'bi-star-fill' : (i - 0.5 <= product.rating ? 'bi-star-half' : 'bi-star')"></i>
+                                    <span class="rating-count">({{ product.reviews }})</span>
+                                </div>
+                                <div class="product-price">
+                                    <span v-if="product.originalPrice > product.price" class="original-price">
+                                        MYR {{ formatPrice(product.originalPrice) }}
+                                    </span>
+                                    <span class="current-price">MYR {{ formatPrice(product.price) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Arcanes</h5>
+                        <p class="mb-4">Crafting timeless jewelry and accessories that celebrate life's special moments and everyday elegance with exceptional quality and design.</p>
+                        <div class="d-flex mb-4">
+                            <a href="https://www.facebook.com/" class="social-icon" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/" class="social-icon" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="https://x.com/home" class="social-icon" target="_blank"><i class="bi bi-twitter"></i></a>
+                            <a href="https://www.pinterest.com/" class="social-icon" target="_blank"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Shop</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="products.html" class="footer-link">All Jewelry</a></li>
+                            <li><a href="products.html#/?category=necklaces" class="footer-link">Necklaces</a></li>
+                            <li><a href="products.html#/?category=rings" class="footer-link">Rings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Earrings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Bracelets</a></li>
+                            <li><a href="products.html#/?category=watches" class="footer-link">Watches</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Company</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="about.html" class="footer-link" target="_blank">About Us</a></li>
+                            <li><a href="Contact.html" class="footer-link" target="_blank">Contact</a></li>
+                            <li><a href="about.html" class="footer-link" target="_blank">FAQ</a></li>
+                            <li><a href="https://www.google.com/maps" class="footer-link" target="_blank">Store Locations</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Contact Us</h5>
+                        <div class="contact-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>75 Jalan Pending, Kuching, Sarawak, Malaysia</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>+60 12-421 2206</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-envelope"></i>
+                            <span>104386924@students.swinburne.edu.my</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-md-0">© 2025 Arcanes. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Privacy Policy</a>
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Terms of Service</a>
+                            <a href="About.html" class="footer-link d-inline-block" target="_blank">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+
+        <!-- Quick View Modal -->
+        <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="quickViewModalLabel">Quick View</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" v-if="selectedProduct">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img :src="selectedProduct.image" class="img-fluid rounded" :alt="selectedProduct.name">
+                            </div>
+                            <div class="col-md-6">
+                                <h4>{{ selectedProduct.name }}</h4>
+                                <div class="product-rating mb-2">
+                                    <i v-for="i in 5" :key="i" class="bi" :class="i <= Math.floor(selectedProduct.rating) ? 'bi-star-fill' : (i - 0.5 <= selectedProduct.rating ? 'bi-star-half' : 'bi-star')"></i>
+                                    <span class="rating-count">({{ selectedProduct.reviews }})</span>
+                                </div>
+                                <div class="product-price mb-3">
+                                    <span v-if="selectedProduct.originalPrice > selectedProduct.price" class="original-price">
+                                        MYR {{ formatPrice(selectedProduct.originalPrice) }}
+                                    </span>
+                                    <span class="current-price">MYR {{ formatPrice(selectedProduct.price) }}</span>
+                                </div>
+                                <p class="mb-4">{{ selectedProduct.description }}</p>
+                                
+                                <div v-if="selectedProduct.features && selectedProduct.features.length > 0" class="mb-4">
+                                    <h6>Features:</h6>
+                                    <ul class="product-features">
+                                        <li v-for="feature in selectedProduct.features" :key="feature"><i class="bi bi-check-circle me-2"></i>{{ feature }}</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="input-group me-3" style="width: 130px;">
+                                        <button class="btn btn-outline-secondary" type="button" @click="decrementQuantity()">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="text" class="form-control text-center" v-model="quantity" readonly>
+                                        <button class="btn btn-outline-secondary" type="button" @click="incrementQuantity()">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button class="btn btn-primary" @click="addToCartWithQuantity(selectedProduct)">
+                                        <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                                    </button>
+                                </div>
+                                
+                                <div class="d-flex">
+                                    <span class="me-3"><strong>Category:</strong> {{ capitalizeFirst(selectedProduct.category) }}</span>
+                                    <span v-if="selectedProduct.material"><strong>Material:</strong> {{ capitalizeFirst(selectedProduct.material) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.prod.js"></script>
+
+    <script>
+        const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+        
+        const app = createApp({
+            setup() {
+                // State
+                const isLoggedIn = ref(false);
+                const scrolled = ref(false);
+                const cartItems = ref([]);
+                const selectedProduct = ref(null);
+                const quantity = ref(1);
+                const shippingFee = ref(25);
+                const recommendedProducts = ref([]);
+                const userData = ref({});
+                const selectedAddress = ref(null);
+                const selectedPayment = ref(null);
+                
+                // Checkout state
+                const checkoutStep = ref(1);
+                const processingOrder = ref(false);
+                const orderNumber = ref('');
+                const checkoutData = reactive({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    address: '',
+                    city: '',
+                    state: '',
+                    zip: '',
+                    phone: '',
+                    saveInfo: false,
+                    paymentMethod: 'credit',
+                    cardName: '',
+                    cardNumber: '',
+                    expMonth: '',
+                    expYear: '',
+                    cvv: ''
+                });
+        
+                // Computed properties
+                const cartTotalItems = computed(() => {
+                    return cartItems.value.reduce((total, item) => total + item.quantity, 0);
+                });
+        
+                const cartSubtotal = computed(() => {
+                    return cartItems.value.reduce((total, item) => total + (item.price * item.quantity), 0);
+                });
+        
+                const tax = computed(() => {
+                    return cartSubtotal.value * 0.06;
+                });
+        
+                const cartTotal = computed(() => {
+                    let shipping = cartSubtotal.value >= 500 ? 0 : shippingFee.value;
+                    return cartSubtotal.value + tax.value + shipping;
+                });
+        
+                // Methods
+                const capitalizeFirst = (str) => {
+                    if (!str) return '';
+                    return str.charAt(0).toUpperCase() + str.slice(1);
+                };
+        
+                const formatPrice = (price) => {
+                    return price.toFixed(2);
+                };
+        
+                const incrementQuantity = (index) => {
+                    if (index !== undefined) {
+                        cartItems.value[index].quantity++;
+                        saveCart();
+                    } else {
+                        quantity.value++;
+                    }
+                };
+        
+                const decrementQuantity = (index) => {
+                    if (index !== undefined) {
+                        if (cartItems.value[index].quantity > 1) {
+                            cartItems.value[index].quantity--;
+                            saveCart();
+                        }
+                    } else {
+                        if (quantity.value > 1) {
+                            quantity.value--;
+                        }
+                    }
+                };
+        
+                const removeItem = (index) => {
+                    cartItems.value.splice(index, 1);
+                    saveCart();
+                };
+        
+                const clearCart = () => {
+                    if (confirm('Are you sure you want to clear your cart?')) {
+                        cartItems.value = [];
+                        saveCart();
+                    }
+                };
+        
+                const saveCart = () => {
+                    localStorage.setItem('cart', JSON.stringify(cartItems.value));
+                };
+        
+                const addToCart = (product) => {
+                    // Check if product is already in cart
+                    const existingItem = cartItems.value.find(item => item.id === product.id);
+                    
+                    if (existingItem) {
+                        // Increment quantity if already in cart
+                        existingItem.quantity++;
+                    } else {
+                        // Add new item to cart
+                        cartItems.value.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1,
+                            material: product.material || '',
+                            gemstone: product.gemstone || ''
+                        });
+                    }
+                    
+                    saveCart();
+                    
+                    // Show confirmation toast
+                    alert(`${product.name} has been added to your cart!`);
+                };
+        
+                const addToCartWithQuantity = (product) => {
+                    // Check if product is already in cart
+                    const existingItem = cartItems.value.find(item => item.id === product.id);
+                    
+                    if (existingItem) {
+                        // Increment quantity if already in cart
+                        existingItem.quantity += quantity.value;
+                    } else {
+                        // Add new item to cart
+                        cartItems.value.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: quantity.value,
+                            material: product.material || '',
+                            gemstone: product.gemstone || ''
+                        });
+                    }
+                    
+                    saveCart();
+                    
+                    // Close modal and reset quantity
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('quickViewModal'));
+                    if (modal) modal.hide();
+                    quantity.value = 1;
+                    
+                    // Show confirmation toast
+                    alert(`${product.name} has been added to your cart!`);
+                };
+        
+                const toggleWishlist = (product) => {
+                    product.inWishlist = !product.inWishlist;
+                };
+        
+                const showQuickView = (product) => {
+                    selectedProduct.value = product;
+                    quantity.value = 1;
+                    const modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+                    modal.show();
+                };
+        
+                const logout = () => {
+                    isLoggedIn.value = false;
+                    localStorage.setItem('isLoggedIn', 'false');
+                };
+        
+                // Checkout function to use the modal
+                const checkout = () => {
+                    // Check if user is logged in
+                    if (!isLoggedIn.value) {
+                        // Save current cart to session storage to keep it after redirect
+                        localStorage.setItem('pendingCheckout', 'true');
+                        alert('Please log in to proceed with checkout');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    
+                    // Load user data from localStorage
+                    try {
+                        const storedUserData = localStorage.getItem('userData');
+                        if (storedUserData) {
+                            userData.value = JSON.parse(storedUserData);
+                            
+                            // Pre-select default address if available
+                            if (userData.value.addresses && userData.value.addresses.length > 0) {
+                                const defaultAddressIndex = userData.value.addresses.findIndex(addr => addr.default);
+                                selectedAddress.value = defaultAddressIndex >= 0 ? defaultAddressIndex : 0;
+                            } else {
+                                selectedAddress.value = null;
+                            }
+                            
+                            // Pre-select default payment method if available
+                            if (userData.value.paymentMethods && userData.value.paymentMethods.length > 0) {
+                                const defaultPaymentIndex = userData.value.paymentMethods.findIndex(pm => pm.default);
+                                selectedPayment.value = defaultPaymentIndex >= 0 ? defaultPaymentIndex : 0;
+                            } else {
+                                selectedPayment.value = null;
+                            }
+                        } else {
+                            userData.value = {};
+                            console.error('No user data found in localStorage');
+                        }
+                    } catch (error) {
+                        console.error('Error loading user data:', error);
+                        userData.value = {};
+                    }
+                    
+                    // Reset checkout flow
+                    checkoutStep.value = 1;
+                    processingOrder.value = false;
+                    orderNumber.value = '';
+                    
+                    // Show checkout modal
+                    const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+                    modal.show();
+                };
+        
+                // Methods to handle checkout flow
+                const nextStep = async () => {
+                    // Validation for each step
+                    if (checkoutStep.value === 1) {
+                        // Check if an address is selected
+                        if (!userData.value.addresses || userData.value.addresses.length === 0) {
+                            alert('Please add a shipping address in your account first');
+                            return;
+                        }
+                        
+                        if (selectedAddress.value === null) {
+                            alert('Please select a shipping address');
+                            return;
+                        }
+                    } else if (checkoutStep.value === 2) {
+                        // Check if a payment method is selected
+                        if (!userData.value.paymentMethods || userData.value.paymentMethods.length === 0) {
+                            alert('Please add a payment method in your account first');
+                            return;
+                        }
+                        
+                        if (selectedPayment.value === null) {
+                            alert('Please select a payment method');
+                            return;
+                        }
+                    } else if (checkoutStep.value === 3) {
+                        // Process order
+                        processingOrder.value = true;
+                        
+                        try {
+                            // Simulate API request to process payment and create order
+                            await new Promise(resolve => setTimeout(resolve, 3000));
+                            
+                            // Generate random order number
+                            orderNumber.value = 'ORD-' + Date.now().toString().slice(-8);
+                            
+                            // Save order to user's history
+                            try {
+                                const storedUserData = localStorage.getItem('userData');
+                                if (storedUserData) {
+                                    const updatedUserData = JSON.parse(storedUserData);
+                                    
+                                    if (!updatedUserData.orders) {
+                                        updatedUserData.orders = [];
+                                    }
+                                    
+                                    // Create order record
+                                    updatedUserData.orders.unshift({
+                                        id: orderNumber.value,
+                                        date: new Date().toISOString(),
+                                        items: [...cartItems.value],
+                                        total: cartTotal.value,
+                                        status: 'Processing',
+                                        shipping: {
+                                            address: userData.value.addresses[selectedAddress.value].street,
+                                            city: userData.value.addresses[selectedAddress.value].city,
+                                            state: userData.value.addresses[selectedAddress.value].state,
+                                            zip: userData.value.addresses[selectedAddress.value].zip
+                                        },
+                                        payment: {
+                                            method: userData.value.paymentMethods[selectedPayment.value].type,
+                                            last4: userData.value.paymentMethods[selectedPayment.value].lastFour
+                                        }
+                                    });
+                                    
+                                    // Save updated user data
+                                    localStorage.setItem('userData', JSON.stringify(updatedUserData));
+                                    
+                                    // Update the local userData reference
+                                    userData.value = updatedUserData;
+                                }
+                            } catch (error) {
+                                console.error('Error saving order to user history:', error);
+                            }
+                            
+                            // Clear cart
+                            cartItems.value = [];
+                            saveCart();
+                            
+                            // Move to confirmation step
+                            checkoutStep.value = 4;
+                        } catch (error) {
+                            console.error('Error processing order:', error);
+                            alert('There was an error processing your order. Please try again.');
+                        } finally {
+                            processingOrder.value = false;
+                        }
+                        return;
+                    }
+                    
+                    // Move to next step
+                    checkoutStep.value++;
+                };
+        
+                const prevStep = () => {
+                    if (checkoutStep.value > 1) {
+                        checkoutStep.value--;
+                    }
+                };
+
+                const getCardIcon = (type) => {
+                    const iconClass = 'bi bi-credit-card-fill';
+                    switch (type.toLowerCase()) {
+                        case 'visa': return `${iconClass} visa`;
+                        case 'mastercard': return `${iconClass} mastercard`;
+                        case 'american express': return `${iconClass} amex`;
+                        case 'discover': return `${iconClass} discover`;
+                        default: return iconClass;
+                    }
+                };
+        
+                const closeCheckoutModal = () => {
+                    if (processingOrder.value) return;
+                    
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+                    if (modal) modal.hide();
+                };
+        
+                const fetchRecommendedProducts = async () => {
+                    try {
+                        const response = await fetch('products.json');
+                        const data = await response.json();
+                        
+                        // Get random products from the products array as recommendations
+                        const allProducts = data.products;
+                        const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+                        recommendedProducts.value = shuffled.slice(0, 4);
+                    } catch (error) {
+                        console.error('Error fetching recommended products:', error);
+                    }
+                };
+        
+                // On component mounted
+                onMounted(() => {
+                    // Check if user is logged in from localStorage
+                    isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
+                    
+                    // Initialize cart from localStorage
+                    const storedCart = localStorage.getItem('cart');
+                    if (storedCart) {
+                        cartItems.value = JSON.parse(storedCart);
+                    }
+                    
+                    // Initialize AOS animation library
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true
+                    });
+                    
+                    // Add scroll event listener for navbar
+                    window.addEventListener('scroll', () => {
+                        scrolled.value = window.scrollY > 50;
+                    });
+                    
+                    // Back to top button functionality
+                    const backToTopButton = document.getElementById('backToTopBtn');
+                    
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 300) {
+                            backToTopButton.style.display = 'flex';
+                        } else {
+                            backToTopButton.style.display = 'none';
+                        }
+                    });
+                    
+                    backToTopButton.addEventListener('click', function() {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                    
+                    // Fetch recommended products
+                    fetchRecommendedProducts();
+                });
+        
+                return {
+                    isLoggedIn,
+                    scrolled,
+                    cartItems,
+                    selectedProduct,
+                    quantity,
+                    shippingFee,
+                    recommendedProducts,
+                    cartTotalItems,
+                    cartSubtotal,
+                    tax,
+                    cartTotal,
+                    checkoutStep,
+                    processingOrder,
+                    orderNumber,
+                    userData,
+                    selectedAddress,
+                    selectedPayment,
+                    checkout,
+                    getCardIcon,
+                    capitalizeFirst,
+                    formatPrice,
+                    incrementQuantity,
+                    decrementQuantity,
+                    removeItem,
+                    clearCart,
+                    addToCart,
+                    addToCartWithQuantity,
+                    toggleWishlist,
+                    showQuickView,
+                    logout,
+                    checkout,
+                    nextStep,
+                    prevStep,
+                    closeCheckoutModal
+                };
+            }
+        });
+        
+        app.mount('#app');
+    </script>
+</body>
+</html>

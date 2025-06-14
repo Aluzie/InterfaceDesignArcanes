@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanes | About Us</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Css/Index.css">
+    <link rel="stylesheet" href="Css/About.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3" :class="{'scrolled': scrolled}">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <i class="bi bi-gem me-2"></i>Arcanes
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="about.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Contact.html">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="cart.html">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                                <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge">
+                                    {{ cartCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <!-- When logged in, show My Account and Logout -->
+                        <template v-if="isLoggedIn">
+                            <li class="nav-item">
+                                <a class="nav-link" href="account.html">
+                                    <i class="bi bi-person-circle me-1"></i>My Account
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="#" @click.prevent="logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </li>
+                        </template>
+                        <!-- When NOT logged in, show Login & Register -->
+                        <template v-else>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.html">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="register.html">Register</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- About Header -->
+        <div class="products-header text-center">
+            <div class="container">
+                <h1 data-aos="fade-up">Our Story</h1>
+                <p data-aos="fade-up" data-aos-delay="100">Crafting elegance since 2018</p>
+            </div>
+        </div>
+
+        <!-- Brand Story Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <img src="https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Jewelry Workshop" class="img-fluid rounded-3 shadow">
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <h2 class="section-title mb-4">The Arcanes Journey</h2>
+                        <p class="lead mb-4">Founded in 2018 by visionary designer Aisya Maisarah Binti Zamahari, Arcanes began as a small workshop in Kuching, dedicated to celebrating Malaysian heritage through contemporary jewelry.</p>
+                        <p>What started as a creative passion project in a modest studio has blossomed into a cherished jewelry brand known for blending traditional Sarawakian motifs with modern aesthetics. Each Arcanes piece embodies Aisya's commitment to quality craftsmanship and cultural storytelling.</p>
+                        <p>The name "Arcanes" was inspired by Aisya's belief that jewelry should carry deeper meaning—each piece holds stories and secrets that connect generations and preserve cultural heritage in wearable art form.</p>
+                        <div class="founder-signature mt-4">
+                            <img src="Images/Signature.png" alt="Founder Signature" width="150">
+                            <p class="text-muted mt-2">Aisya Maisarah Binti Zamahari, Founder</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Values Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">Our Values</h2>
+                    <p class="section-subtitle">The principles that guide everything we do</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="value-card text-center">
+                            <div class="value-icon">
+                                <i class="bi bi-gem"></i>
+                            </div>
+                            <h3>Craftsmanship</h3>
+                            <p>We believe in the power of human hands. Each piece is meticulously crafted by skilled artisans who have honed their craft through years of dedication.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="value-card text-center">
+                            <div class="value-icon">
+                                <i class="bi bi-heart"></i>
+                            </div>
+                            <h3>Heritage</h3>
+                            <p>We draw inspiration from Malaysia's rich cultural tapestry, incorporating traditional motifs and techniques that honor our Sarawakian roots while appealing to modern tastes.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="value-card text-center">
+                            <div class="value-icon">
+                                <i class="bi bi-stars"></i>
+                            </div>
+                            <h3>Sustainability</h3>
+                            <p>We source our materials ethically and responsibly, ensuring our jewelry not only looks beautiful but respects our planet and the communities we work with.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Craftsmanship Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6 order-lg-2" data-aos="fade-left">
+                        <div class="position-relative">
+                            <img src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Jewelry Crafting" class="img-fluid rounded-3 shadow">
+                            <div class="experience-badge">
+                                <span class="number">7</span>
+                                <span class="text">Years of<br>Excellence</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 order-lg-1" data-aos="fade-right">
+                        <h2 class="section-title mb-4">Our Craftsmanship</h2>
+                        <p class="lead mb-4">Every Arcanes piece begins with inspiration from Malaysian culture and ends as a work of art that carries the unmistakable mark of human touch.</p>
+                        
+                        <div class="craftsmanship-step d-flex align-items-start mb-4">
+                            <div class="step-number">01</div>
+                            <div class="step-content">
+                                <h4>Design</h4>
+                                <p>Our designs blend traditional Sarawakian patterns with contemporary aesthetics, creating pieces that honor heritage while appealing to modern sensibilities.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="craftsmanship-step d-flex align-items-start mb-4">
+                            <div class="step-number">02</div>
+                            <div class="step-content">
+                                <h4>Material Selection</h4>
+                                <p>We source only the finest materials—ethically mined gemstones, recycled precious metals, and sustainable alternatives that meet our strict quality standards.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="craftsmanship-step d-flex align-items-start">
+                            <div class="step-number">03</div>
+                            <div class="step-content">
+                                <h4>Handcrafting</h4>
+                                <p>Our artisans combine traditional techniques with modern innovations to transform raw materials into wearable art, with meticulous attention to every detail.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Putting my picture Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">Meet the Founder</h2>
+                    <p class="section-subtitle">The founder behind Arcanes beautiful creations</p>
+                </div>
+                
+                <div class="row justify-content-center g-4">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="team-member">
+                            <div class="member-img">
+                                <img src="Images/Selfie.png" alt="Aisya Maisarah Binti Zamahari" class="img-fluid">
+                                <div class="social-links">
+                                    <a href="#"><i class="bi bi-linkedin"></i></a>
+                                    <a href="#"><i class="bi bi-instagram"></i></a>
+                                </div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Aisya Maisarah Binti Zamahari</h4>
+                                <p class="position">Founder & Lead Designer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+        </section>
+        
+        <!-- Testimonials Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">What Our Customers Say</h2>
+                    <p class="section-subtitle">Stories from people who wear and love our jewelry</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <i class="bi bi-quote quote-icon"></i>
+                                <p>"The engagement ring I purchased from Arcanes exceeded all my expectations. The craftsmanship is exceptional, and my fiancée was absolutely speechless when she saw it. Worth every penny."</p>
+                            </div>
+                            <div class="testimonial-author d-flex align-items-center">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="James Wilson" class="rounded-circle">
+                                <div class="ms-3">
+                                    <h5 class="mb-0">James Wilson</h5>
+                                    <div class="rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <i class="bi bi-quote quote-icon"></i>
+                                <p>"I love how Arcanes incorporates Sarawakian elements into modern jewelry. The pearl necklace with traditional motifs I purchased is now my most treasured piece—I wear it to both casual and formal events."</p>
+                            </div>
+                            <div class="testimonial-author d-flex align-items-center">
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Emma Thompson" class="rounded-circle">
+                                <div class="ms-3">
+                                    <h5 class="mb-0">Emma Thompson</h5>
+                                    <div class="rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <i class="bi bi-quote quote-icon"></i>
+                                <p>"As someone who cares deeply about sustainability, I appreciate Arcanes' commitment to ethical sourcing. Their transparency about materials gives me confidence, and the jewelry itself is stunning."</p>
+                            </div>
+                            <div class="testimonial-author d-flex align-items-center">
+                                <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Aisha Patel" class="rounded-circle">
+                                <div class="ms-3">
+                                    <h5 class="mb-0">Aisha Patel</h5>
+                                    <div class="rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-half"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Call to Action -->
+        <section class="cta-section py-5">
+            <div class="container text-center" data-aos="zoom-in">
+                <h2 class="mb-4">Experience the Arcanes Difference</h2>
+                <p class="lead mb-4">Discover our collection of handcrafted jewelry made with passion and purpose.</p>
+                <a href="products.html" class="btn btn-primary btn-lg">Shop Now</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Arcanes</h5>
+                        <p class="mb-4">Crafting timeless jewelry and accessories that celebrate life's special moments and everyday elegance with exceptional quality and design.</p>
+                        <div class="d-flex mb-4">
+                            <a href="https://www.facebook.com/" class="social-icon" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/" class="social-icon" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="https://x.com/home" class="social-icon" target="_blank"><i class="bi bi-twitter"></i></a>
+                            <a href="https://www.pinterest.com/" class="social-icon" target="_blank"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Shop</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="products.html" class="footer-link">All Jewelry</a></li>
+                            <li><a href="products.html#/?category=necklaces" class="footer-link">Necklaces</a></li>
+                            <li><a href="products.html#/?category=rings" class="footer-link">Rings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Earrings</a></li>
+                            <li><a href="products.html#/?category=earrings" class="footer-link">Bracelets</a></li>
+                            <li><a href="products.html#/?category=watches" class="footer-link">Watches</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <h5 class="footer-title">Company</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="about.html" class="footer-link" target="_blank">About Us</a></li>
+                            <li><a href="Contact.html" class="footer-link" target="_blank">Contact</a></li>
+                            <li><a href="about.html" class="footer-link" target="_blank">FAQ</a></li>
+                            <li><a href="https://www.google.com/maps" class="footer-link" target="_blank">Store Locations</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="footer-title">Contact Us</h5>
+                        <div class="contact-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>75 Jalan Pending, Kuching, Sarawak, Malaysia</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>+60 12-421 2206</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="bi bi-envelope"></i>
+                            <span>104386924@students.swinburne.edu.my</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-md-0">© 2025 Arcanes. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Privacy Policy</a>
+                            <a href="#" class="footer-link d-inline-block me-3" target="_blank">Terms of Service</a>
+                            <a href="About.html" class="footer-link d-inline-block" target="_blank">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.prod.js"></script>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        const app = createApp({
+            setup() {
+                // State
+                const isLoggedIn = ref(false);
+                const scrolled = ref(false);
+                const cartCount = ref(0);
+
+                // Methods
+                const logout = () => {
+                    isLoggedIn.value = false;
+                    localStorage.setItem('isLoggedIn', 'false');
+                };
+
+                // On component mounted
+                onMounted(() => {
+                    // Check if user is logged in from localStorage
+                    isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
+                    
+                    // Initialize cart count
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    cartCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+                    
+                    // Initialize AOS animation library
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true
+                    });
+                    
+                    // Add scroll event listener for navbar
+                    window.addEventListener('scroll', () => {
+                        scrolled.value = window.scrollY > 50;
+                    });
+                    
+                    // Back to top button functionality
+                    const backToTopButton = document.getElementById('backToTopBtn');
+                    
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 300) {
+                            backToTopButton.style.display = 'flex';
+                        } else {
+                            backToTopButton.style.display = 'none';
+                        }
+                    });
+                    
+                    backToTopButton.addEventListener('click', function() {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                });
+
+                return {
+                    isLoggedIn,
+                    scrolled,
+                    cartCount,
+                    logout
+                };
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
